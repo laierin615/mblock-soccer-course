@@ -1,0 +1,1959 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mBlock 足球機器人課程網站</title>
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #647184;
+      --line: #d8e0e8;
+      --paper: #f6f8f3;
+      --white: #ffffff;
+      --field: #21834d;
+      --field-dark: #145f38;
+      --mint: #d9f99d;
+      --blue: #2563b8;
+      --cyan: #0694a2;
+      --amber: #f2b233;
+      --red: #d94b3d;
+      --violet: #7756bf;
+      --shadow: 0 12px 30px rgba(22, 32, 51, .12);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    a { color: var(--blue); }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 22px 18px;
+      color: #f8fff8;
+      background:
+        linear-gradient(rgba(14, 63, 37, .9), rgba(14, 63, 37, .96)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 12px, transparent 12px 38px);
+    }
+
+    .brand {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .brand strong {
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .brand span {
+      color: rgba(255,255,255,.78);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav button {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--radius);
+      color: #f8fff8;
+      background: rgba(255,255,255,.08);
+      text-align: left;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .nav button.active {
+      color: var(--ink);
+      background: var(--mint);
+      border-color: var(--mint);
+    }
+
+    .side-note {
+      margin-top: 22px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: var(--radius);
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+    }
+
+    main {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 340px;
+      padding: 32px;
+      border-radius: var(--radius);
+      color: #fff;
+      background:
+        linear-gradient(120deg, rgba(16, 87, 52, .97), rgba(16, 87, 52, .75)),
+        repeating-linear-gradient(90deg, #237f4d 0 90px, #2f995e 90px 180px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: 34px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #fff 0 17%, transparent 18%),
+        conic-gradient(from 18deg, #111 0 10%, #fff 10% 20%, #111 20% 30%, #fff 30% 40%, #111 40% 50%, #fff 50% 60%, #111 60% 70%, #fff 70% 80%, #111 80% 90%, #fff 90% 100%);
+      opacity: .18;
+      box-shadow: inset 0 0 0 22px rgba(255,255,255,.65);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+    }
+
+    h1, h2, h3, h4 { margin: 0; line-height: 1.25; letter-spacing: 0; }
+    h1 { font-size: clamp(34px, 6vw, 64px); font-weight: 900; }
+    h2 { font-size: clamp(25px, 3vw, 34px); }
+    h3 { font-size: 21px; }
+    p { margin: 8px 0 0; }
+
+    .hero p {
+      max-width: 760px;
+      font-size: 18px;
+      color: rgba(255,255,255,.86);
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .quick-card {
+      min-height: 112px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.14);
+    }
+
+    .quick-card strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .quick-card span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(255,255,255,.82);
+      font-size: 14px;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: 0 8px 24px rgba(22, 32, 51, .08);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      max-width: 780px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .panel {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfe;
+    }
+
+    .panel strong.label {
+      display: block;
+      color: var(--blue);
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #10251b;
+      color: #f8fff8;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--mint);
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .notice {
+      padding: 14px 16px;
+      border-left: 5px solid var(--amber);
+      border-radius: var(--radius);
+      background: #fff7dd;
+      color: #49380b;
+    }
+
+    .success {
+      border-left-color: var(--field);
+      background: #ecfdf3;
+      color: #17462d;
+    }
+
+    .danger {
+      border-left-color: var(--red);
+      background: #fff0ee;
+      color: #642018;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--ink);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn.field {
+      border-color: var(--field);
+      background: var(--field);
+      color: #fff;
+    }
+
+    .btn.warn {
+      border-color: var(--amber);
+      background: var(--amber);
+      color: #251b05;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 10px;
+      border: 1px solid #c8d2de;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    textarea { min-height: 92px; resize: vertical; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef7f1;
+      color: #173b2a;
+      font-weight: 900;
+    }
+
+    .score {
+      font-weight: 900;
+      color: var(--field-dark);
+      font-size: 18px;
+    }
+
+    .lesson-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .lesson-card {
+      display: grid;
+      gap: 10px;
+      min-height: 232px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 5px 16px rgba(22, 32, 51, .06);
+      text-align: left;
+    }
+
+    .lesson-card:hover,
+    .lesson-card:focus {
+      outline: 3px solid rgba(37, 99, 184, .25);
+    }
+
+    .lesson-number {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      color: #fff;
+      background: var(--field-dark);
+      border-radius: 50%;
+      font-weight: 900;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #eaf3ff;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .tag.green {
+      background: #e7f8ee;
+      color: var(--field-dark);
+    }
+
+    .detail-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 18px;
+    }
+
+    .lesson-section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .lesson-section-title span {
+      display: inline-flex;
+      min-height: 30px;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--field-dark);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .student-slides {
+      border: 2px solid #123f29;
+      background:
+        linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)),
+        repeating-linear-gradient(90deg, #23814d 0 80px, #2d965d 80px 160px);
+    }
+
+    .student-slides .lesson-section-title h3 {
+      font-size: 30px;
+      color: var(--field-dark);
+    }
+
+    .class-deck {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .class-slide {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 142px;
+      gap: 16px;
+      min-height: 250px;
+      aspect-ratio: 16 / 9;
+      padding: 24px;
+      border: 2px solid #1b5e3a;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(125deg, rgba(255,255,255,.96), rgba(255,255,255,.9)),
+        repeating-linear-gradient(90deg, #23814d 0 54px, #2f9c61 54px 108px);
+      overflow: hidden;
+    }
+
+    .class-slide::after {
+      content: "";
+      position: absolute;
+      right: -34px;
+      bottom: -36px;
+      width: 118px;
+      height: 118px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #fff 0 18%, transparent 19%),
+        conic-gradient(from 18deg, #111 0 10%, #fff 10% 20%, #111 20% 30%, #fff 30% 40%, #111 40% 50%, #fff 50% 60%, #111 60% 70%, #fff 70% 80%, #111 80% 90%, #fff 90% 100%);
+      opacity: .12;
+    }
+
+    .slide-main {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .slide-kicker {
+      color: var(--blue);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .class-slide h4 {
+      font-size: clamp(24px, 3vw, 38px);
+      color: #123f29;
+    }
+
+    .class-slide ul {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding-left: 1.2rem;
+      font-size: clamp(17px, 1.8vw, 23px);
+      font-weight: 800;
+    }
+
+    .slide-visual {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      align-self: stretch;
+      min-height: 150px;
+      border-radius: var(--radius);
+      color: #fff;
+      background:
+        linear-gradient(90deg, transparent 48%, rgba(255,255,255,.75) 48% 52%, transparent 52%),
+        repeating-linear-gradient(90deg, #24864f 0 24px, #36a365 24px 48px);
+      border: 2px solid rgba(255,255,255,.9);
+      font-size: 42px;
+      font-weight: 900;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .slide-visual small {
+      display: block;
+      margin-top: 8px;
+      font-size: 14px;
+      color: rgba(255,255,255,.86);
+    }
+
+    .teacher-prep {
+      margin-top: 18px;
+      background: #fbfcfe;
+      border-style: dashed;
+    }
+
+    .teacher-prep .lesson-section-title span {
+      background: var(--blue);
+    }
+
+    .teacher-prep-grid {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .prep-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .prep-card + .prep-card {
+      margin-top: 12px;
+    }
+
+    .prep-card h4 {
+      margin-bottom: 7px;
+      color: var(--blue);
+      font-size: 16px;
+    }
+
+    .prep-card ul {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+
+    .flow-list {
+      display: grid;
+      gap: 10px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .flow-list li {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfe;
+    }
+
+    .time {
+      color: var(--field-dark);
+      font-weight: 900;
+    }
+
+    .slide-deck {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .slide {
+      aspect-ratio: 16 / 9;
+      padding: 14px;
+      border: 1px solid #bed4c7;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(33, 131, 77, .1), rgba(37, 99, 184, .1)),
+        #fff;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .slide strong {
+      color: var(--field-dark);
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .slide ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 13px;
+    }
+
+    .operation-gallery {
+      display: grid;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .operation-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .operation-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #eef7f1;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .operation-head strong {
+      color: var(--field-dark);
+      font-size: 16px;
+    }
+
+    .operation-head span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mock-mblock {
+      margin: 14px;
+      border: 1px solid #bfd0df;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #f8fbff;
+      box-shadow: 0 7px 18px rgba(22, 32, 51, .08);
+    }
+
+    .mock-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 7px 10px;
+      color: #fff;
+      background: #22a8ee;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .mock-topbar .file-name {
+      margin-left: auto;
+      padding: 2px 8px;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .mock-body {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr) 150px;
+      min-height: 250px;
+    }
+
+    .mock-palette {
+      padding: 10px 8px;
+      border-right: 1px solid #d6e1eb;
+      background: #f3f8fc;
+    }
+
+    .mock-category {
+      min-height: 26px;
+      padding: 4px 7px;
+      margin-bottom: 7px;
+      border-radius: 999px;
+      color: #17324b;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid #d5e1ec;
+    }
+
+    .mock-category.active {
+      background: #dff5ff;
+      border-color: #6bd3ff;
+      color: #075a73;
+    }
+
+    .mock-workspace {
+      position: relative;
+      padding: 16px;
+      background-image: radial-gradient(#ced7e2 1px, transparent 1px);
+      background-size: 18px 18px;
+      min-width: 0;
+    }
+
+    .mock-hint {
+      max-width: 520px;
+      margin-bottom: 12px;
+      padding: 9px 10px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.86);
+      border: 1px solid #dbe4ee;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mock-stack {
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+
+    .mock-stack .block {
+      box-shadow: 0 2px 0 rgba(0,0,0,.16);
+    }
+
+    .mock-stage {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 12px;
+      border-left: 1px solid #d6e1eb;
+      background: #ffffff;
+    }
+
+    .mock-screen {
+      display: grid;
+      place-items: center;
+      min-height: 104px;
+      border: 1px solid #dce6ef;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, transparent 48%, rgba(255,255,255,.7) 48% 52%, transparent 52%),
+        repeating-linear-gradient(90deg, #28854f 0 28px, #339a60 28px 56px);
+      color: #fff;
+      font-weight: 900;
+      text-align: center;
+      font-size: 13px;
+      padding: 8px;
+    }
+
+    .robot-chip {
+      display: inline-grid;
+      place-items: center;
+      width: 58px;
+      height: 42px;
+      border-radius: 14px 14px 10px 10px;
+      background: #ecf1f6;
+      color: #172033;
+      border: 3px solid #aab8c6;
+      box-shadow: 0 8px 0 rgba(0,0,0,.12);
+    }
+
+    .sensor-panel {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border-radius: var(--radius);
+      background: #f5f8fb;
+      border: 1px solid #dce6ef;
+      font-size: 12px;
+    }
+
+    .sensor-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #e1e8ef;
+    }
+
+    .sensor-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .operation-notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 14px 14px;
+    }
+
+    .operation-note {
+      padding: 10px;
+      border-radius: var(--radius);
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .operation-note strong {
+      display: block;
+      color: var(--blue);
+      margin-bottom: 3px;
+    }
+
+    .block-recipe {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .block {
+      width: fit-content;
+      max-width: 100%;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: inset 0 -2px rgba(0,0,0,.12);
+    }
+
+    .event { background: #ffd14a; }
+    .control { background: #f7a739; }
+    .sense { background: #6bd3ff; }
+    .move { background: #7acb5a; }
+    .look { background: #ba8cff; }
+    .var { background: #ff9a55; }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    pre {
+      max-height: 440px;
+      overflow: auto;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: #111827;
+      color: #e5edf7;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .app-shell { grid-template-columns: 1fr; }
+      aside {
+        position: static;
+        height: auto;
+      }
+      .nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      main { padding: 14px; }
+      .quick-grid,
+      .grid.two,
+      .grid.three,
+      .grid.four,
+      .lesson-grid,
+      .detail-layout,
+      .class-deck,
+      .class-slide,
+      .teacher-prep-grid,
+      .mock-body,
+      .operation-notes,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      aside, .toolbar, .btn, form { display: none !important; }
+      .app-shell { display: block; }
+      main { padding: 0; }
+      .view { display: block; }
+      .section, .hero, .panel, .lesson-card { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside>
+      <div class="brand">
+        <strong>mBlock 足球機器人聯盟</strong>
+        <span>12 節課程網站、球隊球員登錄、計分與成果發表</span>
+      </div>
+      <nav class="nav" aria-label="主選單">
+        <button class="active" data-view="dashboard">聯盟總覽</button>
+        <button data-view="admin">球隊與計分</button>
+        <button data-view="lessons">12 節課教材</button>
+        <button data-view="assessment">成果發表</button>
+        <button data-view="deploy">GitHub 與 Google Sheet</button>
+      </nav>
+      <div class="side-note">
+        目前版本可直接放到 GitHub Pages。若尚未設定 Google Apps Script，表單會先存到本機瀏覽器，方便課堂測試。
+      </div>
+    </aside>
+
+    <main>
+      <section id="dashboard" class="view active">
+        <div class="hero">
+          <div class="hero-content">
+            <h1>12 節課打造智慧足球機器人聯盟</h1>
+            <p>20 位一到五年級混齡學生，分成四支球隊，用三台程小奔與一台 mBot2 完成聲控、光控、循線、辨色、避障、遙控與成果發表。</p>
+            <div class="quick-grid">
+              <div class="quick-card"><strong>20</strong><span>學生，四組混齡</span></div>
+              <div class="quick-card"><strong>4</strong><span>三台程小奔，一台 mBot2</span></div>
+              <div class="quick-card"><strong>12</strong><span>十節任務，兩節發表</span></div>
+              <div class="quick-card"><strong>5</strong><span>隊長、程式、測試、紀錄、播報</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>目前排行榜</h2>
+              <p>分數來自核心任務、團隊合作、除錯、創意與同儕回饋。若 Google Sheet 尚未連線，這裡會使用本機示範資料。</p>
+            </div>
+            <button class="btn primary" id="refreshDataBtn">重新讀取資料</button>
+          </div>
+          <div id="connectionStatus" class="notice">尚未設定 Google Apps Script API，現在使用本機資料。</div>
+          <div class="grid four" id="scoreMetrics"></div>
+          <div class="panel">
+            <strong class="label">球隊積分表</strong>
+            <div class="table-wrap">
+              <table id="scoreboardTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>分組輪站</h2>
+              <p>每節課輪換一次設備，避免 mBot2 只有同一組使用。每組內的五種角色也每節輪替。</p>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>節次</th><th>紅隊</th><th>藍隊</th><th>綠隊</th><th>黃隊</th></tr></thead>
+            <tbody>
+              <tr><td>1、5、9</td><td>程小奔 A</td><td>程小奔 B</td><td>程小奔 C</td><td>mBot2 挑戰站</td></tr>
+              <tr><td>2、6、10</td><td>mBot2 挑戰站</td><td>程小奔 A</td><td>程小奔 B</td><td>程小奔 C</td></tr>
+              <tr><td>3、7、11</td><td>程小奔 C</td><td>mBot2 挑戰站</td><td>程小奔 A</td><td>程小奔 B</td></tr>
+              <tr><td>4、8、12</td><td>程小奔 B</td><td>程小奔 C</td><td>mBot2 挑戰站</td><td>程小奔 A</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="admin" class="view">
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>球隊、球員登錄與計分</h2>
+              <p>登錄資料會送到 Google Sheet；尚未連線時會先存在本機瀏覽器。建議學生使用暱稱或座號，不輸入公開個資。</p>
+            </div>
+          </div>
+          <div class="grid three">
+            <div class="panel">
+              <strong class="label">新增球隊</strong>
+              <form id="teamForm">
+                <div class="form-grid">
+                  <label>隊名<input name="teamName" required placeholder="例如：紅隊閃電"></label>
+                  <label>隊色<input name="teamColor" required placeholder="紅色"></label>
+                  <label>設備<select name="device"><option>程小奔 A</option><option>程小奔 B</option><option>程小奔 C</option><option>mBot2</option></select></label>
+                  <label>口號<input name="slogan" placeholder="穩定傳球，勇敢除錯"></label>
+                </div>
+                <div class="toolbar"><button class="btn field" type="submit">送出球隊</button></div>
+              </form>
+            </div>
+            <div class="panel">
+              <strong class="label">新增球員</strong>
+              <form id="playerForm">
+                <div class="form-grid">
+                  <label>球隊<select name="teamId" id="playerTeamSelect"></select></label>
+                  <label>暱稱<input name="nickname" required placeholder="例如：測試手 1"></label>
+                  <label>年級<select name="grade"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+                  <label>角色<select name="role"><option>隊長</option><option>程式手</option><option>測試手</option><option>紀錄手</option><option>播報手</option></select></label>
+                  <label>背號<input name="jerseyNo" type="number" min="0" max="99" value="10"></label>
+                  <label>備註<input name="notes" placeholder="可留空"></label>
+                </div>
+                <div class="toolbar"><button class="btn field" type="submit">送出球員</button></div>
+              </form>
+            </div>
+            <div class="panel">
+              <strong class="label">新增分數</strong>
+              <form id="scoreForm">
+                <div class="form-grid">
+                  <label>課程<select name="lessonNo" id="lessonSelect"></select></label>
+                  <label>球隊<select name="teamId" id="scoreTeamSelect"></select></label>
+                  <label>核心任務<input name="corePoints" type="number" min="0" max="10" value="10"></label>
+                  <label>團隊合作<input name="teamworkPoints" type="number" min="0" max="5" value="5"></label>
+                  <label>除錯修正<input name="debugPoints" type="number" min="0" max="5" value="5"></label>
+                  <label>足球創意<input name="creativityPoints" type="number" min="0" max="5" value="5"></label>
+                  <label>同儕回饋<input name="peerFeedbackPoints" type="number" min="0" max="3" value="3"></label>
+                  <label>任務名稱<input name="mission" placeholder="例如：聲控開球"></label>
+                </div>
+                <label>備註<textarea name="note" placeholder="記錄成功條件、失敗原因或下次改法"></textarea></label>
+                <div class="toolbar"><button class="btn field" type="submit">送出分數</button></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="grid two">
+            <div class="panel"><strong class="label">球隊清單</strong><table id="teamsTable"></table></div>
+            <div class="panel"><strong class="label">球員清單</strong><table id="playersTable"></table></div>
+          </div>
+          <div class="panel" style="margin-top:14px"><strong class="label">計分紀錄</strong><table id="scoresTable"></table></div>
+        </div>
+      </section>
+
+      <section id="lessons" class="view">
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>12 節課教材</h2>
+              <p>點進每一堂課會先看到可直接投影的上課簡報；往下才是教師備課資料、詳細流程、操作畫面與除錯提示。</p>
+            </div>
+          </div>
+          <div class="lesson-grid" id="lessonCards"></div>
+        </div>
+        <div class="section hidden" id="lessonDetail"></div>
+      </section>
+
+      <section id="assessment" class="view">
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>最後兩節成果發表</h2>
+              <p>成果重點不是一次成功，而是能說清楚足球問題、程式規則、測試失敗與修正策略。</p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="panel">
+              <strong class="label">第 11 節：製作與彩排</strong>
+              <ol>
+                <li>選定足球任務：聲控開球、夜間球場、循線跑位、辨色裁判、避障守門或遙控傳球。</li>
+                <li>完成作品最小可展示版本，並記錄至少一次失敗與修正。</li>
+                <li>排 90 秒介紹：30 秒情境、40 秒展示、20 秒程式邏輯。</li>
+                <li>同組輪流檢查每位成員是否都有工作與發言。</li>
+              </ol>
+            </div>
+            <div class="panel">
+              <strong class="label">第 12 節：展示賽</strong>
+              <ol>
+                <li>每組完成正式展示與現場操作。</li>
+                <li>其他組給一個優點和一個具體建議。</li>
+                <li>教師依評量規準給分，並把分數登錄到後台。</li>
+                <li>全班討論下一版機器人足球聯盟可加入什麼規則。</li>
+              </ol>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>項目</th><th>3 分</th><th>2 分</th><th>1 分</th></tr></thead>
+            <tbody>
+              <tr><td>足球任務</td><td>情境明確，機器人可重複完成任務。</td><td>任務清楚，偶爾失敗但知道原因。</td><td>需教師協助才能展示。</td></tr>
+              <tr><td>程式邏輯</td><td>能說出事件、條件、重複或變數。</td><td>能指出主要積木和用途。</td><td>只能描述動作，尚未連結規則。</td></tr>
+              <tr><td>測試除錯</td><td>能提出具體修改，例如門檻、速度、順序。</td><td>有測試紀錄，但修正理由還可更清楚。</td><td>遇到失敗時需要提示。</td></tr>
+              <tr><td>團隊合作</td><td>五位成員都有角色並互相支援。</td><td>多數成員參與，分工仍可調整。</td><td>少數人包辦。</td></tr>
+              <tr><td>表達回饋</td><td>90 秒內清楚介紹並能回答問題。</td><td>能完成介紹但時間或重點需調整。</td><td>需要提示才能完成介紹。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="deploy" class="view">
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>永久網址、GitHub Pages 與 Google Sheet</h2>
+              <p>Cloudflare Quick Tunnel 是臨時預覽網址。永久版本建議放到 GitHub Pages，後台用 Google Sheet 搭配 Apps Script Web App。</p>
+            </div>
+          </div>
+          <div class="notice danger"><strong>網域說明：</strong>`trycloudflare.com` 臨時網址不是永久網址，電腦或 tunnel 關掉就可能失效。GitHub Pages 會給你 `https://你的帳號.github.io/儲存庫名稱/`，也可以再綁定自己的自訂網域。</div>
+          <div class="grid two" style="margin-top:14px">
+            <div class="panel">
+              <strong class="label">Google Apps Script API 設定</strong>
+              <label>Apps Script Web App URL<input id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></label>
+              <label>班級代碼<input id="classCodeInput" value="SOCCER2026"></label>
+              <div class="toolbar">
+                <button class="btn field" id="saveConfigBtn">儲存設定</button>
+                <button class="btn primary" id="testApiBtn">測試連線</button>
+              </div>
+              <div id="apiTestResult" class="notice">尚未測試。</div>
+            </div>
+            <div class="panel">
+              <strong class="label">GitHub Pages 發布步驟</strong>
+              <ol>
+                <li>在 GitHub 建立新 repository，例如 `mblock-soccer-course`。</li>
+                <li>把 `outputs` 裡的網站檔案上傳到 repository 根目錄。</li>
+                <li>到 Settings → Pages，Source 選 `Deploy from a branch`。</li>
+                <li>Branch 選 `main`，資料夾選 `/root`，按 Save。</li>
+                <li>等待 GitHub 產生網址，再把網址貼回 Google Sheet 的 Settings。</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>Apps Script 後台程式</h2>
+              <p>先把後台 Excel 範本上傳到 Google Drive 並用 Google Sheets 開啟，再到 Extensions → Apps Script，貼上以下程式並部署為 Web App。</p>
+            </div>
+            <button class="btn warn" id="copyScriptBtn">複製程式碼</button>
+          </div>
+          <pre id="appsScriptCode"></pre>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script id="apps-script-source" type="text/plain">
+const SHEET_NAMES = {
+  settings: 'Settings',
+  teams: 'Teams',
+  players: 'Players',
+  scores: 'Scores',
+  lessons: 'Lessons'
+};
+
+function doGet(e) {
+  return handleRequest_(e.parameter || {}, true);
+}
+
+function doPost(e) {
+  const params = Object.assign({}, e.parameter || {});
+  if (e.postData && e.postData.contents) {
+    try {
+      Object.assign(params, JSON.parse(e.postData.contents));
+    } catch (err) {
+      // Form posts use e.parameter, JSON posts use e.postData.
+    }
+  }
+  return handleRequest_(params, false);
+}
+
+function handleRequest_(params, isGet) {
+  const action = params.action || 'all';
+  let result;
+  try {
+    if (action === 'ping') result = { ok: true, message: 'connected', now: new Date().toISOString() };
+    else if (action === 'all') result = getAll_();
+    else if (action === 'createTeam') result = createTeam_(params);
+    else if (action === 'createPlayer') result = createPlayer_(params);
+    else if (action === 'addScore') result = addScore_(params);
+    else result = { ok: false, error: 'Unknown action: ' + action };
+  } catch (err) {
+    result = { ok: false, error: String(err && err.message ? err.message : err) };
+  }
+
+  const callback = params.callback;
+  if (isGet && callback) {
+    return ContentService
+      .createTextOutput(callback + '(' + JSON.stringify(result) + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getAll_() {
+  return {
+    ok: true,
+    teams: readObjects_(SHEET_NAMES.teams, 3),
+    players: readObjects_(SHEET_NAMES.players, 3),
+    scores: readObjects_(SHEET_NAMES.scores, 3),
+    lessons: readObjects_(SHEET_NAMES.lessons, 3)
+  };
+}
+
+function createTeam_(params) {
+  validateClassCode_(params.classCode);
+  const sheet = ss_().getSheetByName(SHEET_NAMES.teams);
+  const id = 'T' + Date.now();
+  sheet.appendRow([
+    id,
+    params.teamName || '',
+    params.teamColor || '',
+    params.slogan || '',
+    params.device || '',
+    today_(),
+    params.notes || ''
+  ]);
+  return Object.assign({ ok: true, teamId: id }, getAll_());
+}
+
+function createPlayer_(params) {
+  validateClassCode_(params.classCode);
+  const sheet = ss_().getSheetByName(SHEET_NAMES.players);
+  const id = 'P' + Date.now();
+  sheet.appendRow([
+    id,
+    params.teamId || '',
+    params.nickname || '',
+    Number(params.grade || 0),
+    params.role || '',
+    Number(params.jerseyNo || 0),
+    params.notes || '',
+    today_()
+  ]);
+  return Object.assign({ ok: true, playerId: id }, getAll_());
+}
+
+function addScore_(params) {
+  validateClassCode_(params.classCode);
+  const sheet = ss_().getSheetByName(SHEET_NAMES.scores);
+  const core = Number(params.corePoints || 0);
+  const teamwork = Number(params.teamworkPoints || 0);
+  const debug = Number(params.debugPoints || 0);
+  const creativity = Number(params.creativityPoints || 0);
+  const peer = Number(params.peerFeedbackPoints || 0);
+  const total = core + teamwork + debug + creativity + peer;
+  const id = 'S' + Date.now();
+  sheet.appendRow([
+    id,
+    Number(params.lessonNo || 0),
+    params.teamId || '',
+    params.mission || '',
+    core,
+    teamwork,
+    debug,
+    creativity,
+    peer,
+    total,
+    params.note || '',
+    Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm')
+  ]);
+  return Object.assign({ ok: true, scoreId: id }, getAll_());
+}
+
+function readObjects_(sheetName, headerRow) {
+  const sheet = ss_().getSheetByName(sheetName);
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+  if (lastRow <= headerRow) return [];
+  const headers = sheet.getRange(headerRow, 1, 1, lastCol).getValues()[0];
+  const values = sheet.getRange(headerRow + 1, 1, lastRow - headerRow, lastCol).getValues();
+  return values
+    .filter(row => row.some(value => value !== ''))
+    .map(row => {
+      const item = {};
+      headers.forEach((header, index) => item[String(header)] = row[index]);
+      return item;
+    });
+}
+
+function validateClassCode_(provided) {
+  const required = getSetting_('classCode');
+  if (required && String(required) !== String(provided || '')) {
+    throw new Error('classCode 不正確');
+  }
+}
+
+function getSetting_(key) {
+  const rows = ss_().getSheetByName(SHEET_NAMES.settings).getRange('A3:B20').getValues();
+  const found = rows.find(row => row[0] === key);
+  return found ? found[1] : '';
+}
+
+function today_() {
+  return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+}
+
+function ss_() {
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
+  </script>
+
+  <script>
+    const lessons = [
+      { no: 1, title: "開季選秀：認識 mBlock 與程小奔", skill: "入門連線", mission: "球隊報到、隊色燈光、按鍵開場", blocks: ["當開始", "顯示隊名", "設定 RGB LED", "當按鈕 A 被按下", "播放開場音效"], goals: ["能指出 mBlock 的角色區、設備區與積木區", "能完成設備連線與第一個事件程式", "能用隊色與口號建立球隊認同"] },
+      { no: 2, title: "開球動作：按鈕、馬達與慶祝舞", skill: "事件與動作", mission: "按鍵啟動開球，進球後做慶祝舞", blocks: ["當按鈕 A 被按下", "前進 1 秒", "左轉 0.5 秒", "LED 顯示 GOAL", "播放音效"], goals: ["理解事件啟動流程", "能組合前進、停止、轉向", "能用流程圖規劃慶祝動作"] },
+      { no: 3, title: "球迷聲浪：聲控應援與音量判斷", skill: "聲控", mission: "球迷加油聲達到門檻才出發", blocks: ["重複執行", "讀取聲音值", "如果 音量 > 門檻", "前進", "否則 顯示再大聲"], goals: ["能讀取聲音感測值", "能設定門檻變數", "能說明如果否則判斷"] },
+      { no: 4, title: "夜間球場：光控照明與門檻值", skill: "光控", mission: "光線不足時自動開啟球場燈", blocks: ["設定 夜賽門檻", "讀取光線值", "如果 光線 < 門檻", "RGB LED 全亮", "否則 白天模式"], goals: ["能比較亮暗數值", "能設定光控門檻", "能讓 LED 依情境改變"] },
+      { no: 5, title: "沿線跑位：黑白線判斷與循線前進", skill: "循線", mission: "沿球場邊線跑位到指定區域", blocks: ["重複執行", "左感測器黑線？", "右感測器黑線？", "左修正 / 右修正", "慢速前進"], goals: ["能分辨黑線與白底讀值", "能用條件修正方向", "能測試速度與穩定度"] },
+      { no: 6, title: "裁判色卡：RGB 辨色與唱歌提示", skill: "辨色", mission: "紅停、黃慢、綠走、藍慶祝", blocks: ["辨識顏色", "如果 顏色 = 紅色", "停止", "LED 顯示紅色", "播放短音"], goals: ["能辨識至少三種顏色", "能把顏色轉換成足球規則", "能設計裁判指令"] },
+      { no: 7, title: "避開防守：紅外線與超音波避障", skill: "避障", mission: "遇到防守者自動後退轉向", blocks: ["重複執行", "讀取距離", "如果 距離 < 15 公分", "後退並轉向", "否則 前進"], goals: ["能理解距離感測", "能設計避障流程", "能用表情或音效呈現狀態"] },
+      { no: 8, title: "遙控傳球：IR、手機與 mBot2 賽車", skill: "遙控", mission: "遙控機器人完成三點傳球", blocks: ["當收到 上", "前進", "當收到 左", "左轉", "當收到 停止"], goals: ["能設定方向控制", "能完成停止安全機制", "能用傳球點設計路線"] },
+      { no: 9, title: "球場天氣台：物聯網資料與播報", skill: "物聯網", mission: "播報今天是否適合比賽", blocks: ["取得天氣", "組合字串", "如果 下雨", "播報延期", "廣播訊息"], goals: ["能理解線上資料來源", "能組合播報文字", "能用條件判斷比賽建議"] },
+      { no: 10, title: "AI 裁判與互動遊戲：Panda、辨識與得分", skill: "AI 與遊戲", mission: "用 AI 或 Panda 做裁判與單字挑戰", blocks: ["設定分數 = 0", "如果 答案正確", "分數 + 1", "廣播慶祝", "角色互動"], goals: ["能理解 AI 辨識流程", "能建立簡單得分遊戲", "能讓角色與設備互動"] },
+      { no: 11, title: "成果發表一：小組專題製作與彩排", skill: "整合製作", mission: "完成展示作品並排練 90 秒介紹", blocks: ["選定任務", "整合感測器", "測試三次", "記錄修正", "彩排介紹"], goals: ["能整合至少一種感測器", "能記錄失敗與修正", "能分配發表角色"] },
+      { no: 12, title: "成果發表二：智慧足球聯盟展示賽", skill: "展演與回饋", mission: "正式展示、互評與反思", blocks: ["作品展示", "程式解說", "同儕提問", "計分登錄", "學習反思"], goals: ["能清楚展示足球任務", "能回應同學問題", "能提出下一版改進"] }
+    ];
+
+    const defaultData = {
+      teams: [
+        { teamId: "T001", teamName: "紅隊", teamColor: "紅色", slogan: "全場壓迫，穩定傳球", device: "程小奔 A" },
+        { teamId: "T002", teamName: "藍隊", teamColor: "藍色", slogan: "冷靜判斷，精準射門", device: "程小奔 B" },
+        { teamId: "T003", teamName: "綠隊", teamColor: "綠色", slogan: "快速跑位，合作防守", device: "程小奔 C" },
+        { teamId: "T004", teamName: "黃隊", teamColor: "黃色", slogan: "勇敢測試，修正再戰", device: "mBot2" }
+      ],
+      players: [
+        { playerId: "P001", teamId: "T001", nickname: "紅隊隊長", grade: 5, role: "隊長", jerseyNo: 10 },
+        { playerId: "P002", teamId: "T002", nickname: "藍隊測試手", grade: 3, role: "測試手", jerseyNo: 7 },
+        { playerId: "P003", teamId: "T003", nickname: "綠隊紀錄手", grade: 2, role: "紀錄手", jerseyNo: 5 },
+        { playerId: "P004", teamId: "T004", nickname: "黃隊播報手", grade: 1, role: "播報手", jerseyNo: 9 }
+      ],
+      scores: [
+        { scoreId: "S001", lessonNo: 1, teamId: "T001", mission: "球隊報到", corePoints: 10, teamworkPoints: 5, debugPoints: 5, creativityPoints: 5, peerFeedbackPoints: 3, total: 28, note: "示範資料" },
+        { scoreId: "S002", lessonNo: 1, teamId: "T002", mission: "球隊報到", corePoints: 10, teamworkPoints: 5, debugPoints: 4, creativityPoints: 5, peerFeedbackPoints: 3, total: 27, note: "示範資料" },
+        { scoreId: "S003", lessonNo: 1, teamId: "T003", mission: "球隊報到", corePoints: 9, teamworkPoints: 5, debugPoints: 5, creativityPoints: 5, peerFeedbackPoints: 2, total: 26, note: "示範資料" },
+        { scoreId: "S004", lessonNo: 1, teamId: "T004", mission: "球隊報到", corePoints: 9, teamworkPoints: 4, debugPoints: 5, creativityPoints: 4, peerFeedbackPoints: 3, total: 25, note: "示範資料" }
+      ],
+      lessons
+    };
+
+    let state = loadLocalData();
+
+    function loadLocalData() {
+      const saved = localStorage.getItem("mblockSoccerData");
+      return saved ? JSON.parse(saved) : structuredClone(defaultData);
+    }
+
+    function saveLocalData() {
+      localStorage.setItem("mblockSoccerData", JSON.stringify(state));
+    }
+
+    function getConfig() {
+      return {
+        apiUrl: localStorage.getItem("mblockSoccerApiUrl") || "",
+        classCode: localStorage.getItem("mblockSoccerClassCode") || "SOCCER2026"
+      };
+    }
+
+    function setStatus(message, kind = "notice") {
+      const el = document.getElementById("connectionStatus");
+      el.className = "notice " + (kind === "success" ? "success" : kind === "danger" ? "danger" : "");
+      el.textContent = message;
+    }
+
+    function jsonp(action, payload = {}) {
+      const { apiUrl, classCode } = getConfig();
+      if (!apiUrl) return Promise.reject(new Error("尚未設定 Apps Script Web App URL"));
+      return new Promise((resolve, reject) => {
+        const callback = "mblockSoccerCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+        const params = new URLSearchParams({ action, callback, classCode, ...payload });
+        const script = document.createElement("script");
+        const cleanup = () => {
+          delete window[callback];
+          script.remove();
+        };
+        window[callback] = (data) => {
+          cleanup();
+          if (data && data.ok === false) reject(new Error(data.error || "API 回傳失敗"));
+          else resolve(data);
+        };
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("無法連線到 Apps Script"));
+        };
+        script.src = apiUrl + (apiUrl.includes("?") ? "&" : "?") + params.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    async function loadRemoteData() {
+      try {
+        const data = await jsonp("all");
+        state = {
+          teams: data.teams || [],
+          players: data.players || [],
+          scores: data.scores || [],
+          lessons: lessons
+        };
+        saveLocalData();
+        setStatus("已連線 Google Sheet，資料已更新。", "success");
+      } catch (err) {
+        setStatus(err.message + "；目前使用本機資料。", "danger");
+      }
+      renderAll();
+    }
+
+    async function submitAction(action, payload, localFallback) {
+      try {
+        const data = await jsonp(action, payload);
+        if (data.teams) state.teams = data.teams;
+        if (data.players) state.players = data.players;
+        if (data.scores) state.scores = data.scores;
+        saveLocalData();
+        setStatus("已寫入 Google Sheet。", "success");
+      } catch (err) {
+        localFallback();
+        saveLocalData();
+        setStatus(err.message + "；已暫存到本機資料。", "danger");
+      }
+      renderAll();
+    }
+
+    function teamName(teamId) {
+      return state.teams.find(team => team.teamId === teamId)?.teamName || teamId || "";
+    }
+
+    function scoreboardRows() {
+      return state.teams.map(team => {
+        const teamScores = state.scores.filter(score => score.teamId === team.teamId);
+        const total = teamScores.reduce((sum, score) => sum + Number(score.total || 0), 0);
+        const players = state.players.filter(player => player.teamId === team.teamId).length;
+        return {
+          team,
+          players,
+          entries: teamScores.length,
+          total,
+          avg: teamScores.length ? total / teamScores.length : 0
+        };
+      }).sort((a, b) => b.total - a.total);
+    }
+
+    function renderTable(id, headers, rows) {
+      const table = document.getElementById(id);
+      table.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${cell ?? ""}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    }
+
+    function renderDashboard() {
+      const rows = scoreboardRows();
+      const metrics = document.getElementById("scoreMetrics");
+      const top = rows[0];
+      metrics.innerHTML = [
+        ["球隊數", state.teams.length],
+        ["球員數", state.players.length],
+        ["計分筆數", state.scores.length],
+        ["目前領先", top ? `${top.team.teamName} ${top.total}` : "尚無"]
+      ].map(([label, value]) => `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`).join("");
+      renderTable("scoreboardTable", ["排名", "球隊", "隊色", "球員", "計分筆數", "總分", "平均"], rows.map((row, index) => [
+        index + 1,
+        row.team.teamName,
+        row.team.teamColor || "",
+        row.players,
+        row.entries,
+        `<span class="score">${row.total}</span>`,
+        row.avg.toFixed(1)
+      ]));
+    }
+
+    function renderAdmin() {
+      const teamOptions = state.teams.map(team => `<option value="${team.teamId}">${team.teamName}</option>`).join("");
+      document.getElementById("playerTeamSelect").innerHTML = teamOptions;
+      document.getElementById("scoreTeamSelect").innerHTML = teamOptions;
+      document.getElementById("lessonSelect").innerHTML = lessons.map(lesson => `<option value="${lesson.no}">${lesson.no}. ${lesson.title}</option>`).join("");
+      renderTable("teamsTable", ["代號", "隊名", "隊色", "設備", "口號"], state.teams.map(team => [team.teamId, team.teamName, team.teamColor, team.device, team.slogan]));
+      renderTable("playersTable", ["代號", "球隊", "暱稱", "年級", "角色", "背號"], state.players.map(player => [player.playerId, teamName(player.teamId), player.nickname, player.grade, player.role, player.jerseyNo]));
+      renderTable("scoresTable", ["課程", "球隊", "任務", "總分", "備註"], state.scores.slice().reverse().map(score => [score.lessonNo, teamName(score.teamId), score.mission, `<span class="score">${score.total}</span>`, score.note || ""]));
+    }
+
+    function lessonFlow(lesson) {
+      return [
+        ["0-5 分", `足球情境導入：${lesson.mission}，請學生預測需要哪些感測器或事件。`],
+        ["5-10 分", `教師示範：開啟 mBlock，指出本節核心積木，示範一個最小可行版本。`],
+        ["10-25 分", `小組實作：隊長分工，程式手拼積木，測試手放到球場，紀錄手記下第一次結果。`],
+        ["25-35 分", `任務挑戰：每組至少完成一次足球任務，並調整速度、門檻、顏色或路線。`],
+        ["35-45 分", `除錯回合：每組說出一個失敗現象，只改一個參數後再測一次。`],
+        ["45-50 分", `中場分享：播報手用一句足球轉播語介紹成果，教師登錄分數或通關章。`]
+      ];
+    }
+
+    function lessonSlides(lesson) {
+      const preset = operationPreset(lesson);
+      return [
+        {
+          kicker: `第 ${lesson.no} 節｜${lesson.skill}`,
+          title: lesson.title.replace(/^.*?：/, ""),
+          bullets: [`今天任務：${lesson.mission}`, "先成功一次，再加創意", "每組都要有人測試、有人紀錄"],
+          visual: "開賽"
+        },
+        {
+          kicker: "我們要學會",
+          title: "把足球規則變成程式規則",
+          bullets: lesson.goals.slice(0, 3),
+          visual: lesson.skill
+        },
+        {
+          kicker: "mBlock 操作",
+          title: "先找到正確設備和積木",
+          bullets: [`設備：${preset.device}`, `分類：${preset.category}`, `核心積木：${lesson.blocks[0]}`],
+          visual: "mBlock"
+        },
+        {
+          kicker: "跟著做",
+          title: "先堆最小可行程式",
+          bullets: lesson.blocks.slice(0, 4),
+          visual: "積木"
+        },
+        {
+          kicker: "測試任務",
+          title: "到球場上測三次",
+          bullets: ["第一次：觀察現象", "第二次：只改一個地方", "第三次：確認有沒有變穩"],
+          visual: preset.stage
+        },
+        {
+          kicker: "中場分享",
+          title: "像足球主播一樣說明",
+          bullets: ["我們完成了什麼？", "哪個條件最重要？", "下一版要改哪裡？"],
+          visual: "分享"
+        }
+      ];
+    }
+
+    function renderClassSlide(slide, index) {
+      return `
+        <article class="class-slide">
+          <div class="slide-main">
+            <div class="slide-kicker">${slide.kicker}</div>
+            <h4>${slide.title}</h4>
+            <ul>${slide.bullets.map(item => `<li>${item}</li>`).join("")}</ul>
+          </div>
+          <div class="slide-visual">
+            <div>${slide.visual}<small>投影片 ${index + 1}</small></div>
+          </div>
+        </article>
+      `;
+    }
+
+    function teacherPrep(lesson) {
+      const preset = operationPreset(lesson);
+      return {
+        equipment: [
+          `${preset.device}，先確認電量與連線`,
+          "黑色膠帶、色卡、紙杯或足球場地圖依任務準備",
+          "每組一張測試紀錄表：現象、修改、結果"
+        ],
+        roles: [
+          "隊長：確認時間與任務",
+          "程式手：操作 mBlock",
+          "測試手：放置與回收機器人",
+          "紀錄手：寫下讀值與除錯",
+          "播報手：最後 30 秒分享"
+        ],
+        observe: [
+          preset.focus,
+          "低年級可負責按鍵、測試、唸出讀值",
+          "高年級負責門檻、條件判斷與修正策略"
+        ]
+      };
+    }
+
+    function operationPreset(lesson) {
+      const presets = {
+        1: {
+          category: "事件",
+          device: "程小奔",
+          stage: "隊名亮相",
+          sensorRows: [["連線", "已連接"], ["模式", "即時"], ["隊色", "紅 / 藍 / 綠 / 黃"]],
+          readBlocks: ["當開始", "顯示隊名", "設定 RGB LED", "等待按鈕 A"],
+          testBlocks: ["按 A 鍵", "播放開場音效", "LED 閃爍 3 次", "播報手介紹隊名"],
+          focus: "讓學生先分清楚「角色」和「設備」：Panda 是角色，程小奔是設備。"
+        },
+        2: {
+          category: "mBot2 車架",
+          device: "程小奔 / mBot2",
+          stage: "開球跑位",
+          sensorRows: [["馬達", "左右輪"], ["速度", "30-50"], ["安全", "先會停止"]],
+          readBlocks: ["當按鈕 A 被按下", "前進 1 秒", "停止", "左轉 0.5 秒"],
+          testBlocks: ["貼起點線", "按 A 開球", "進球後亮燈", "調整速度"],
+          focus: "提醒孩子先寫停止積木，避免測試時機器人一路衝出球場。"
+        },
+        3: {
+          category: "偵測",
+          device: "程小奔聲音感測器",
+          stage: "球迷聲浪",
+          sensorRows: [["安靜", "18-25"], ["普通說話", "35-55"], ["全組加油", "70 以上"]],
+          readBlocks: ["重複執行", "讀取聲音值", "如果 音量 > 70", "前進並亮隊色"],
+          testBlocks: ["先讀安靜值", "再讀加油值", "設定門檻", "三次測試取最穩定"],
+          focus: "門檻值不是猜的，要用三次讀值決定。低年級可負責喊口號與記錄數字。"
+        },
+        4: {
+          category: "偵測",
+          device: "程小奔光線感測器",
+          stage: "夜間球場",
+          sensorRows: [["教室光", "55-75"], ["手遮住", "10-25"], ["手電筒", "85-100"]],
+          readBlocks: ["設定 夜賽門檻 = 35", "如果 光線 < 門檻", "RGB LED 全亮", "否則 關燈"],
+          testBlocks: ["讀三種光線", "設定夜賽門檻", "遮住感測器", "檢查燈號是否切換"],
+          focus: "同一間教室不同位置光線不同，請每組用自己的讀值設定門檻。"
+        },
+        5: {
+          category: "灰階感測",
+          device: "程小奔灰階 / mBot2 四路感測器",
+          stage: "沿線跑位",
+          sensorRows: [["白底", "高值"], ["黑線", "低值"], ["速度", "先慢後快"]],
+          readBlocks: ["如果 左黑右白", "往左修正", "如果 右黑左白", "往右修正", "否則慢速前進"],
+          testBlocks: ["貼黑線球場", "放在線上", "慢速測 30 秒", "失去線時回到上一方向"],
+          focus: "循線最常壞在速度太快；先讓學生用慢速成功，再逐步加速。"
+        },
+        6: {
+          category: "RGB 感測",
+          device: "程小奔 RGB 顏色感測器",
+          stage: "裁判色卡",
+          sensorRows: [["紅卡", "停止"], ["黃卡", "慢速"], ["綠卡", "前進"], ["藍卡", "慶祝"]],
+          readBlocks: ["讀取顏色", "如果 顏色 = 紅色", "停止", "LED 顯示同色"],
+          testBlocks: ["準備色卡", "每張卡測三次", "修正感測距離", "加入音效提示"],
+          focus: "色卡太遠或光線太暗會誤判；固定色卡距離比換程式更重要。"
+        },
+        7: {
+          category: "超音波 / 紅外線",
+          device: "mBot2 超音波 / 程小奔紅外線",
+          stage: "避開防守",
+          sensorRows: [["安全距離", "30 cm"], ["警戒距離", "15 cm"], ["碰撞風險", "10 cm 以下"]],
+          readBlocks: ["讀取距離", "如果 距離 < 15", "後退", "右轉", "否則前進"],
+          testBlocks: ["放紙杯防守者", "慢速靠近", "測後退距離", "改轉向角度"],
+          focus: "避障測試要先讓學生站在球場外側觀察，避免手伸進輪子附近。"
+        },
+        8: {
+          category: "事件 / 遙控",
+          device: "程小奔 IR / mBot2 遙控",
+          stage: "遙控傳球",
+          sensorRows: [["上", "前進"], ["下", "後退"], ["左 / 右", "轉向"], ["中鍵", "停止"]],
+          readBlocks: ["當收到 上", "前進", "當收到 左", "左轉", "當收到 停止"],
+          testBlocks: ["標三個傳球點", "練停止鍵", "計時但不撞線", "記錄犯規次數"],
+          focus: "遙控課要先定義犯規線，讓學生知道精準比速度更重要。"
+        },
+        9: {
+          category: "物聯網",
+          device: "程小奔網路資料",
+          stage: "球場天氣台",
+          sensorRows: [["溫度", "台北最高溫"], ["雨天", "延期"], ["空氣品質", "室內訓練"]],
+          readBlocks: ["取得天氣資料", "組合字串", "如果 下雨", "播報延期", "廣播訊息"],
+          testBlocks: ["確認網路", "選城市", "顯示溫度", "依天氣給比賽建議"],
+          focus: "若網路不穩，教師可改用天氣資料卡，讓學生照樣練習條件判斷。"
+        },
+        10: {
+          category: "人工智慧",
+          device: "Panda 角色 + 程小奔",
+          stage: "AI 裁判",
+          sensorRows: [["辨識成功", "+1"], ["答案錯誤", "不加分"], ["廣播", "機器人慶祝"]],
+          readBlocks: ["設定分數 = 0", "如果 辨識成功", "分數 + 1", "廣播 GOAL"],
+          testBlocks: ["選辨識素材", "測三張圖片", "檢查分數", "讓程小奔慶祝"],
+          focus: "AI 辨識要讓學生知道它不是魔法，而是根據資料做機率判斷。"
+        },
+        11: {
+          category: "整合專題",
+          device: "小組自選設備",
+          stage: "彩排檢查",
+          sensorRows: [["作品", "可展示"], ["腳本", "90 秒"], ["除錯", "至少一次"]],
+          readBlocks: ["選任務", "整合積木", "測試三次", "記錄修改"],
+          testBlocks: ["排操作手", "排解說手", "測場地", "填發表檢核"],
+          focus: "彩排不是重做作品，而是讓作品穩定、說明清楚、每個人有角色。"
+        },
+        12: {
+          category: "成果展演",
+          device: "展示設備",
+          stage: "聯盟展示賽",
+          sensorRows: [["展示", "90 秒"], ["回饋", "一優點一建議"], ["計分", "登錄後台"]],
+          readBlocks: ["介紹任務", "展示機器人", "說明程式", "回答問題"],
+          testBlocks: ["上場前測試", "展示一次", "同儕回饋", "更新排行榜"],
+          focus: "把焦點放在學習歷程：為什麼這樣寫、失敗過什麼、下一版想改什麼。"
+        }
+      };
+      return presets[lesson.no];
+    }
+
+    function operationScreens(lesson) {
+      const preset = operationPreset(lesson);
+      return [
+        {
+          title: "畫面 1：開啟 mBlock 並確認設備",
+          caption: `設備選擇 ${preset.device}，確認連線、模式與本節要使用的積木分類。`,
+          hint: "教師先投影這個畫面，帶學生指出左側分類、中央工作區、右側舞台或設備預覽。",
+          category: preset.category,
+          blocks: ["新增設備", `選擇 ${preset.device}`, "連接藍牙 / USB", "切換即時模式"],
+          stage: preset.stage,
+          sensorRows: preset.sensorRows,
+          notes: ["先確認設備名稱", "按停止鍵測安全", "低年級負責檢查燈號"]
+        },
+        {
+          title: "畫面 2：堆出核心程式",
+          caption: "先做最小可行版本，不急著加特效。成功一次後，再加足球情境。",
+          hint: `把本節核心積木拖到中央：${lesson.blocks.slice(0, 3).join(" → ")}。`,
+          category: lesson.skill,
+          blocks: lesson.blocks,
+          stage: "程式測試",
+          sensorRows: [["核心任務", lesson.mission], ["積木數", `${lesson.blocks.length} 個起步`], ["測試", "至少 3 次"]],
+          notes: ["事件積木放最上方", "條件積木包住反應", "一次只改一個參數"]
+        },
+        {
+          title: "畫面 3：讀值、門檻與判斷",
+          caption: "感測器課一定要先看讀值，再決定門檻。不要讓學生直接猜數字。",
+          hint: "右側讀值面板用來記錄測試數字；紀錄手把三次數據寫到學習單。",
+          category: "偵測 / 變數",
+          blocks: preset.readBlocks,
+          stage: "讀值觀察",
+          sensorRows: preset.sensorRows,
+          notes: ["先讀環境值", "再讀任務值", "門檻取中間值"]
+        },
+        {
+          title: "畫面 4：放到足球場測試",
+          caption: "從桌面測試移到球場測試，觀察路線、速度、穩定度與安全停止。",
+          hint: preset.focus,
+          category: "測試與除錯",
+          blocks: preset.testBlocks,
+          stage: "球場測試",
+          sensorRows: [["成功條件", "可重複完成"], ["除錯方法", "一次改一項"], ["記錄", "現象 / 修改 / 結果"]],
+          notes: ["測試手放車", "紀錄手寫現象", "播報手準備一句說明"]
+        }
+      ];
+    }
+
+    function renderOperationScreen(screen, index) {
+      const categories = ["事件", "控制", "偵測", "變數", "外觀", "mBot2 車架"];
+      const categoryList = categories.map(category => `<div class="mock-category ${screen.category.includes(category) || category.includes(screen.category) ? "active" : ""}">${category}</div>`).join("");
+      const blockClasses = ["event", "control", "sense", "var", "look", "move"];
+      return `
+        <div class="operation-card">
+          <div class="operation-head">
+            <div>
+              <strong>${screen.title}</strong>
+              <span>${screen.caption}</span>
+            </div>
+            <span>操作截圖 ${index + 1}</span>
+          </div>
+          <div class="mock-mblock" aria-label="${screen.title}">
+            <div class="mock-topbar">
+              <span>makeblock | mBlock</span>
+              <span>檔案</span>
+              <span>儲存</span>
+              <span class="file-name">足球任務_${index + 1}</span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-palette">${categoryList}</div>
+              <div class="mock-workspace">
+                <div class="mock-hint">${screen.hint}</div>
+                <div class="mock-stack">${screen.blocks.map((block, blockIndex) => `<span class="block ${blockClasses[blockIndex % blockClasses.length]}">${block}</span>`).join("")}</div>
+              </div>
+              <div class="mock-stage">
+                <div class="mock-screen"><span class="robot-chip">${screen.stage}</span></div>
+                <div class="sensor-panel">${screen.sensorRows.map(([label, value]) => `<div class="sensor-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div>
+              </div>
+            </div>
+          </div>
+          <div class="operation-notes">${screen.notes.map((note, noteIndex) => `<div class="operation-note"><strong>${["教師看這裡", "學生要做", "常見除錯"][noteIndex] || "提示"}</strong>${note}</div>`).join("")}</div>
+        </div>
+      `;
+    }
+
+    function renderLessons() {
+      document.getElementById("lessonCards").innerHTML = lessons.map(lesson => `
+        <button class="lesson-card" data-lesson="${lesson.no}">
+          <span class="lesson-number">${lesson.no}</span>
+          <h3>${lesson.title}</h3>
+          <div class="tags"><span class="tag green">${lesson.skill}</span><span class="tag">足球任務</span></div>
+          <p>${lesson.mission}</p>
+        </button>
+      `).join("");
+    }
+
+    function showLesson(no) {
+      const lesson = lessons.find(item => item.no === Number(no));
+      const detail = document.getElementById("lessonDetail");
+      const flow = lessonFlow(lesson);
+      const slides = lessonSlides(lesson);
+      const operations = operationScreens(lesson);
+      const prep = teacherPrep(lesson);
+      detail.classList.remove("hidden");
+      detail.innerHTML = `
+        <div class="section-head">
+          <div>
+            <h2>${lesson.no}. ${lesson.title}</h2>
+            <p>${lesson.mission}</p>
+          </div>
+          <button class="btn" id="closeLessonBtn">關閉詳細頁</button>
+        </div>
+        <div class="panel student-slides">
+          <div class="lesson-section-title">
+            <div>
+              <h3>上課簡報</h3>
+              <p class="note">投影給學生看的版本：大字、短句、每張只留一個重點。</p>
+            </div>
+            <span>學生看這裡</span>
+          </div>
+          <div class="class-deck">${slides.map(renderClassSlide).join("")}</div>
+        </div>
+
+        <div class="panel teacher-prep">
+          <div class="lesson-section-title">
+            <div>
+              <h3>教師備課資料</h3>
+              <p class="note">老師課前與課中使用：流程、器材、分工、操作畫面、除錯提醒與積木提示。</p>
+            </div>
+            <span>教師備課</span>
+          </div>
+          <div class="teacher-prep-grid">
+            <div>
+              <div class="prep-card">
+                <h4>學習目標</h4>
+                <ul>${lesson.goals.map(goal => `<li>${goal}</li>`).join("")}</ul>
+              </div>
+              <div class="prep-card">
+                <h4>課前器材</h4>
+                <ul>${prep.equipment.map(item => `<li>${item}</li>`).join("")}</ul>
+              </div>
+              <div class="prep-card">
+                <h4>混齡分工</h4>
+                <ul>${prep.roles.map(item => `<li>${item}</li>`).join("")}</ul>
+              </div>
+              <div class="prep-card">
+                <h4>教師觀察重點</h4>
+                <ul>${prep.observe.map(item => `<li>${item}</li>`).join("")}</ul>
+              </div>
+              <div class="prep-card">
+                <h4>詳細教學流程</h4>
+                <ul class="flow-list">${flow.map(([time, text]) => `<li><span class="time">${time}</span><span>${text}</span></li>`).join("")}</ul>
+              </div>
+              <div class="prep-card">
+                <h4>mBlock 積木提示</h4>
+                <div class="block-recipe">${lesson.blocks.map((block, index) => `<span class="block ${["event","look","sense","control","move","var"][index % 6]}">${block}</span>`).join("")}</div>
+              </div>
+            </div>
+            <div>
+              <div class="prep-card">
+                <h4>操作畫面示範</h4>
+                <p class="note">可在示範時投影，也可印成教師備課圖卡：從連線、堆積木、讀值測試到足球場除錯。</p>
+                <div class="operation-gallery">${operations.map(renderOperationScreen).join("")}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("closeLessonBtn").addEventListener("click", () => detail.classList.add("hidden"));
+      detail.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderConfig() {
+      const config = getConfig();
+      document.getElementById("apiUrlInput").value = config.apiUrl;
+      document.getElementById("classCodeInput").value = config.classCode;
+      document.getElementById("appsScriptCode").textContent = document.getElementById("apps-script-source").textContent.trim();
+    }
+
+    function renderAll() {
+      renderDashboard();
+      renderAdmin();
+      renderLessons();
+      renderConfig();
+    }
+
+    document.querySelectorAll(".nav button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".nav button").forEach(item => item.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById(button.dataset.view).classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    document.getElementById("refreshDataBtn").addEventListener("click", loadRemoteData);
+
+    document.getElementById("teamForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+      submitAction("createTeam", data, () => {
+        state.teams.push({ teamId: "T" + Date.now(), ...data, createdAt: new Date().toISOString().slice(0, 10) });
+      });
+      event.currentTarget.reset();
+    });
+
+    document.getElementById("playerForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+      submitAction("createPlayer", data, () => {
+        state.players.push({ playerId: "P" + Date.now(), ...data, createdAt: new Date().toISOString().slice(0, 10) });
+      });
+      event.currentTarget.reset();
+    });
+
+    document.getElementById("scoreForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+      const total = ["corePoints", "teamworkPoints", "debugPoints", "creativityPoints", "peerFeedbackPoints"].reduce((sum, key) => sum + Number(data[key] || 0), 0);
+      submitAction("addScore", data, () => {
+        state.scores.push({ scoreId: "S" + Date.now(), ...data, total, timestamp: new Date().toISOString() });
+      });
+      event.currentTarget.reset();
+    });
+
+    document.addEventListener("click", event => {
+      const card = event.target.closest("[data-lesson]");
+      if (card) showLesson(card.dataset.lesson);
+    });
+
+    document.getElementById("saveConfigBtn").addEventListener("click", () => {
+      localStorage.setItem("mblockSoccerApiUrl", document.getElementById("apiUrlInput").value.trim());
+      localStorage.setItem("mblockSoccerClassCode", document.getElementById("classCodeInput").value.trim() || "SOCCER2026");
+      renderConfig();
+      document.getElementById("apiTestResult").className = "notice success";
+      document.getElementById("apiTestResult").textContent = "設定已儲存。";
+    });
+
+    document.getElementById("testApiBtn").addEventListener("click", async () => {
+      const result = document.getElementById("apiTestResult");
+      try {
+        const data = await jsonp("ping");
+        result.className = "notice success";
+        result.textContent = "連線成功：" + (data.message || "connected");
+      } catch (err) {
+        result.className = "notice danger";
+        result.textContent = err.message;
+      }
+    });
+
+    document.getElementById("copyScriptBtn").addEventListener("click", async () => {
+      const code = document.getElementById("apps-script-source").textContent.trim();
+      await navigator.clipboard.writeText(code);
+      document.getElementById("copyScriptBtn").textContent = "已複製";
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
