@@ -8,6 +8,11 @@
 
 可以。這份網站是純靜態 HTML，可以直接放到 GitHub Pages。
 
+目前已發布：
+
+- GitHub repo: https://github.com/laierin615/mblock-soccer-course
+- GitHub Pages: https://laierin615.github.io/mblock-soccer-course/
+
 ## GitHub Pages 步驟
 
 1. 在 GitHub 建立 repository，例如 `mblock-soccer-course`。
