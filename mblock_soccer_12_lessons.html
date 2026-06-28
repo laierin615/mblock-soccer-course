@@ -516,6 +516,14 @@
       color: #123f29;
     }
 
+    .slide-title-en {
+      display: block;
+      margin-top: 4px;
+      color: var(--blue);
+      font-size: clamp(18px, 2vw, 25px);
+      font-weight: 900;
+    }
+
     .class-slide ul {
       display: grid;
       gap: 8px;
@@ -523,6 +531,13 @@
       padding-left: 1.2rem;
       font-size: clamp(17px, 1.8vw, 23px);
       font-weight: 800;
+    }
+
+    .class-slide li span {
+      display: block;
+      color: var(--muted);
+      font-size: .78em;
+      font-weight: 700;
     }
 
     .slide-visual {
@@ -588,6 +603,64 @@
     .prep-card ul {
       margin: 0;
       padding-left: 1.15rem;
+    }
+
+    .bilingual-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .bilingual-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .bilingual-card strong {
+      display: block;
+      color: var(--field-dark);
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .bilingual-card em {
+      display: block;
+      color: var(--blue);
+      font-style: normal;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .vocab-list,
+    .phrase-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .vocab-chip,
+    .phrase-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eaf3ff;
+      color: #174078;
+      border: 1px solid #bed7fb;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .phrase-chip {
+      border-radius: var(--radius);
+      background: #f2f8f5;
+      color: #173b2a;
+      border-color: #c9e5d4;
     }
 
     .flow-list {
@@ -903,6 +976,7 @@
       .grid.two,
       .grid.three,
       .grid.four,
+      .bilingual-grid,
       .lesson-grid,
       .detail-layout,
       .class-deck,
@@ -993,6 +1067,39 @@
             </tbody>
           </table>
         </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <h2>國際化雙語學習目標</h2>
+              <p>把機器人足球任務轉化成 CLIL 雙語學習：學生不只完成程式，也能用簡短英文描述任務、感測器、測試結果與團隊合作。</p>
+            </div>
+          </div>
+          <div class="bilingual-grid">
+            <div class="bilingual-card">
+              <strong>Content 內容</strong>
+              <em>Robotics and football tasks</em>
+              <p>理解事件、感測器、條件判斷、循線、避障、遙控與計分。</p>
+            </div>
+            <div class="bilingual-card">
+              <strong>Communication 溝通</strong>
+              <em>Say what the robot does</em>
+              <p>能用英文句型說明：Our robot can..., The sensor detects..., We changed...</p>
+            </div>
+            <div class="bilingual-card">
+              <strong>Culture 國際化</strong>
+              <em>Fair play and teamwork</em>
+              <p>連結足球的公平競賽、角色分工、同儕回饋與跨文化合作精神。</p>
+            </div>
+          </div>
+          <div class="phrase-list">
+            <span class="phrase-chip">Ready, test, debug!</span>
+            <span class="phrase-chip">Our robot can follow the line.</span>
+            <span class="phrase-chip">The sensor detects light.</span>
+            <span class="phrase-chip">We changed the speed.</span>
+            <span class="phrase-chip">Fair play, fair test.</span>
+          </div>
+        </div>
       </section>
 
       <section id="admin" class="view">
@@ -1078,6 +1185,17 @@
             <div>
               <h2>最後兩節成果發表</h2>
               <p>成果重點不是一次成功，而是能說清楚足球問題、程式規則、測試失敗與修正策略。</p>
+            </div>
+          </div>
+          <div class="bilingual-card" style="margin-bottom:14px">
+            <strong>雙語成果發表 Presentation Frames</strong>
+            <em>Students explain their robot to an international audience.</em>
+            <div class="phrase-list">
+              <span class="phrase-chip">Our robot can __.</span>
+              <span class="phrase-chip">The sensor detects __.</span>
+              <span class="phrase-chip">We tested it three times.</span>
+              <span class="phrase-chip">We changed __ to make it better.</span>
+              <span class="phrase-chip">Our next step is __.</span>
             </div>
           </div>
           <div class="grid two">
@@ -1504,43 +1622,162 @@ function ss_() {
       ];
     }
 
+    function bilingualInfo(lesson) {
+      const info = {
+        1: {
+          titleEn: "Team Draft: Meet mBlock and Codey Rocky",
+          skillEn: "Getting Started",
+          missionEn: "Register your team, show team colors, and start with a button.",
+          vocab: ["team", "device", "connect", "start", "LED"],
+          frames: ["Our team color is __.", "We connect the device.", "Press button A to start."]
+        },
+        2: {
+          titleEn: "Kickoff Moves: Buttons, Motors, and Celebration",
+          skillEn: "Events and Motion",
+          missionEn: "Press a button to kick off and celebrate after a goal.",
+          vocab: ["kickoff", "motor", "move", "turn", "celebrate"],
+          frames: ["The robot moves forward.", "It turns left.", "We celebrate a goal."]
+        },
+        3: {
+          titleEn: "Fan Noise: Voice Control and Volume",
+          skillEn: "Voice Control",
+          missionEn: "The robot starts when the cheering is loud enough.",
+          vocab: ["sound", "volume", "threshold", "cheer", "loud"],
+          frames: ["The volume is __.", "If the sound is loud, the robot starts.", "Cheer for your team."]
+        },
+        4: {
+          titleEn: "Night Match: Light Control",
+          skillEn: "Light Control",
+          missionEn: "Turn on the stadium lights when it is dark.",
+          vocab: ["light", "dark", "bright", "stadium", "threshold"],
+          frames: ["The light value is __.", "If it is dark, turn on the LED.", "This is night mode."]
+        },
+        5: {
+          titleEn: "Run the Line: Line Following",
+          skillEn: "Line Following",
+          missionEn: "Follow the field line to reach the target area.",
+          vocab: ["line", "black", "white", "sensor", "follow"],
+          frames: ["The robot follows the line.", "The left sensor sees black.", "We changed the speed."]
+        },
+        6: {
+          titleEn: "Referee Cards: RGB Color Commands",
+          skillEn: "Color Detection",
+          missionEn: "Use color cards as referee commands.",
+          vocab: ["color", "red card", "yellow card", "green", "stop"],
+          frames: ["Red means stop.", "Green means go.", "The sensor detects blue."]
+        },
+        7: {
+          titleEn: "Avoid Defenders: Obstacle Avoidance",
+          skillEn: "Obstacle Avoidance",
+          missionEn: "Move away from defenders and choose a new path.",
+          vocab: ["distance", "obstacle", "defender", "avoid", "turn"],
+          frames: ["The distance is __ centimeters.", "If it is too close, move back.", "The robot avoids the defender."]
+        },
+        8: {
+          titleEn: "Remote Passing: Control and Pass",
+          skillEn: "Remote Control",
+          missionEn: "Control the robot to pass through three points.",
+          vocab: ["remote", "forward", "backward", "left", "right"],
+          frames: ["Press up to move forward.", "Press middle to stop.", "We pass to point two."]
+        },
+        9: {
+          titleEn: "Stadium Weather Report",
+          skillEn: "IoT Weather",
+          missionEn: "Report whether the weather is good for a match.",
+          vocab: ["weather", "temperature", "rain", "air quality", "report"],
+          frames: ["The temperature is __ degrees.", "It is rainy today.", "We should play indoors."]
+        },
+        10: {
+          titleEn: "AI Referee and Panda Game",
+          skillEn: "AI and Game",
+          missionEn: "Use AI or Panda to judge and score.",
+          vocab: ["AI", "recognize", "score", "answer", "game"],
+          frames: ["AI recognizes the image.", "The answer is correct.", "The score is __."]
+        },
+        11: {
+          titleEn: "Project Build and Rehearsal",
+          skillEn: "Project Integration",
+          missionEn: "Build your showcase project and rehearse a 90-second pitch.",
+          vocab: ["project", "rehearse", "prototype", "debug", "present"],
+          frames: ["Our project is __.", "We tested it three times.", "We fixed one problem."]
+        },
+        12: {
+          titleEn: "Smart Soccer League Showcase",
+          skillEn: "Presentation and Feedback",
+          missionEn: "Present your robot, explain your code, and give feedback.",
+          vocab: ["showcase", "feedback", "teamwork", "fair play", "improve"],
+          frames: ["Our robot can __.", "The most important block is __.", "Next time, we will improve __."]
+        }
+      };
+      return info[lesson.no];
+    }
+
     function lessonSlides(lesson) {
       const preset = operationPreset(lesson);
+      const bilingual = bilingualInfo(lesson);
       return [
         {
           kicker: `第 ${lesson.no} 節｜${lesson.skill}`,
           title: lesson.title.replace(/^.*?：/, ""),
-          bullets: [`今天任務：${lesson.mission}`, "先成功一次，再加創意", "每組都要有人測試、有人紀錄"],
+          titleEn: bilingual.titleEn,
+          bullets: [
+            { zh: `今天任務：${lesson.mission}`, en: `Mission: ${bilingual.missionEn}` },
+            { zh: "先成功一次，再加創意", en: "Make it work first, then add creativity." },
+            { zh: "每組都要有人測試、有人紀錄", en: "Every team needs a tester and a recorder." }
+          ],
           visual: "開賽"
         },
         {
           kicker: "我們要學會",
           title: "把足球規則變成程式規則",
-          bullets: lesson.goals.slice(0, 3),
+          titleEn: "Turn football rules into code",
+          bullets: lesson.goals.slice(0, 3).map((goal, index) => ({
+            zh: goal,
+            en: ["I can explain the task.", "I can build and test the code.", "I can improve with my team."][index]
+          })),
           visual: lesson.skill
         },
         {
           kicker: "mBlock 操作",
           title: "先找到正確設備和積木",
-          bullets: [`設備：${preset.device}`, `分類：${preset.category}`, `核心積木：${lesson.blocks[0]}`],
+          titleEn: "Find the right device and blocks",
+          bullets: [
+            { zh: `設備：${preset.device}`, en: `Device: ${preset.device}` },
+            { zh: `分類：${preset.category}`, en: `Category: ${bilingual.skillEn}` },
+            { zh: `核心積木：${lesson.blocks[0]}`, en: `Key block: ${bilingual.vocab[0]}` }
+          ],
           visual: "mBlock"
         },
         {
           kicker: "跟著做",
           title: "先堆最小可行程式",
-          bullets: lesson.blocks.slice(0, 4),
+          titleEn: "Build the simplest working program",
+          bullets: lesson.blocks.slice(0, 4).map((block, index) => ({
+            zh: block,
+            en: bilingual.frames[index] || `Use: ${bilingual.vocab[index] || bilingual.skillEn}`
+          })),
           visual: "積木"
         },
         {
           kicker: "測試任務",
           title: "到球場上測三次",
-          bullets: ["第一次：觀察現象", "第二次：只改一個地方", "第三次：確認有沒有變穩"],
+          titleEn: "Test on the field three times",
+          bullets: [
+            { zh: "第一次：觀察現象", en: "Test 1: Observe what happens." },
+            { zh: "第二次：只改一個地方", en: "Test 2: Change one thing." },
+            { zh: "第三次：確認有沒有變穩", en: "Test 3: Check if it is stable." }
+          ],
           visual: preset.stage
         },
         {
           kicker: "中場分享",
           title: "像足球主播一樣說明",
-          bullets: ["我們完成了什麼？", "哪個條件最重要？", "下一版要改哪裡？"],
+          titleEn: "Explain like a football commentator",
+          bullets: [
+            { zh: "我們完成了什麼？", en: "Our robot can __." },
+            { zh: "哪個條件最重要？", en: "The most important condition is __." },
+            { zh: "下一版要改哪裡？", en: "Next time, we will improve __." }
+          ],
           visual: "分享"
         }
       ];
@@ -1551,8 +1788,8 @@ function ss_() {
         <article class="class-slide">
           <div class="slide-main">
             <div class="slide-kicker">${slide.kicker}</div>
-            <h4>${slide.title}</h4>
-            <ul>${slide.bullets.map(item => `<li>${item}</li>`).join("")}</ul>
+            <h4>${slide.title}<span class="slide-title-en">${slide.titleEn}</span></h4>
+            <ul>${slide.bullets.map(item => `<li>${item.zh}<span>${item.en}</span></li>`).join("")}</ul>
           </div>
           <div class="slide-visual">
             <div>${slide.visual}<small>投影片 ${index + 1}</small></div>
@@ -1563,6 +1800,7 @@ function ss_() {
 
     function teacherPrep(lesson) {
       const preset = operationPreset(lesson);
+      const bilingual = bilingualInfo(lesson);
       return {
         equipment: [
           `${preset.device}，先確認電量與連線`,
@@ -1580,7 +1818,8 @@ function ss_() {
           preset.focus,
           "低年級可負責按鍵、測試、唸出讀值",
           "高年級負責門檻、條件判斷與修正策略"
-        ]
+        ],
+        bilingual
       };
     }
 
@@ -1786,8 +2025,10 @@ function ss_() {
         <button class="lesson-card" data-lesson="${lesson.no}">
           <span class="lesson-number">${lesson.no}</span>
           <h3>${lesson.title}</h3>
-          <div class="tags"><span class="tag green">${lesson.skill}</span><span class="tag">足球任務</span></div>
+          <p><strong>${bilingualInfo(lesson).titleEn}</strong></p>
+          <div class="tags"><span class="tag green">${lesson.skill}</span><span class="tag">${bilingualInfo(lesson).skillEn}</span></div>
           <p>${lesson.mission}</p>
+          <p class="note">${bilingualInfo(lesson).missionEn}</p>
         </button>
       `).join("");
     }
@@ -1829,6 +2070,12 @@ function ss_() {
           </div>
           <div class="teacher-prep-grid">
             <div>
+              <div class="prep-card">
+                <h4>雙語教學支援 CLIL Support</h4>
+                <p><strong>${prep.bilingual.skillEn}</strong>｜${prep.bilingual.missionEn}</p>
+                <div class="vocab-list">${prep.bilingual.vocab.map(word => `<span class="vocab-chip">${word}</span>`).join("")}</div>
+                <div class="phrase-list">${prep.bilingual.frames.map(frame => `<span class="phrase-chip">${frame}</span>`).join("")}</div>
+              </div>
               <div class="prep-card">
                 <h4>學習目標</h4>
                 <ul>${lesson.goals.map(goal => `<li>${goal}</li>`).join("")}</ul>
