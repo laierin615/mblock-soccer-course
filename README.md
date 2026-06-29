@@ -6,7 +6,7 @@
 - 雙語教學：中英並列投影片、vocabulary、sentence frames、CLIL 支援
 - 教師備課資料：流程、器材、分工、操作畫面與除錯提示
 - 球隊與球員登錄
-- 計分排行榜
+- 老師密碼鎖定的計分排行榜
 - Google Sheet 後台範本
 - Google Apps Script 串接程式
 
@@ -18,7 +18,9 @@ GitHub Pages 啟用後，首頁會從 `index.html` 自動導向：
 
 ## Google Sheet 後台
 
-請參考 `GITHUB_PAGES_AND_SHEETS_SETUP.md`，將 `mblock_soccer_google_sheet_backend.xlsx` 上傳到 Google Drive，再貼上 `google-apps-script-backend.gs` 並部署為 Web App。
+請參考 `GITHUB_PAGES_AND_SHEETS_SETUP.md`，將 `mblock_soccer_google_sheet_backend.xlsx` 上傳到 Google Drive，再貼上 `google-apps-script-backend.gs` 並部署為 Web App。部署後回到網站貼上 Web App URL，輸入老師計分密碼並按「初始化後台」。
+
+預設老師計分密碼為 `543861`；網站不保存明文密碼，計分時會送 SHA-256 雜湊到 Apps Script 後台驗證。
 
 ## 個資提醒
 

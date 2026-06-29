@@ -38,7 +38,18 @@
 7. Execute as 選 `Me`。
 8. Who has access 選 `Anyone with the link`。
 9. 部署後複製 Web App URL。
-10. 回到課程網站 → `GitHub 與 Google Sheet` → 貼上 Web App URL → 儲存設定。
+10. 回到課程網站 → `GitHub 與 Google Sheet` → 貼上 Web App URL → 按 `儲存設定`。
+11. 老師輸入計分密碼 `543861`，按 `初始化後台`。
+12. 看到「後台初始化完成」後，球隊、球員與計分資料就會寫入 Google Sheet。
+
+## 老師計分密碼
+
+- 預設老師計分密碼：`543861`
+- 網站不會儲存明文密碼；送出分數前會先轉成 SHA-256 雜湊。
+- Apps Script 會比對 Google Sheet `Settings` 分頁中的 `teacherPasswordHash`。
+- 預設雜湊值：
+  `6d60392b6d56e300f7c5e8f94415bc675e971037881b673a799a545a91191f04`
+- 如果之後要改密碼，請先用 SHA-256 產生新密碼雜湊，再把 `Settings` 分頁的 `teacherPasswordHash` 改成新值。
 
 ## 學生資料提醒
 

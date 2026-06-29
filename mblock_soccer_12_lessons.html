@@ -318,6 +318,10 @@
       gap: 12px;
     }
 
+    .form-grid .wide {
+      grid-column: 1 / -1;
+    }
+
     label {
       display: grid;
       gap: 6px;
@@ -337,6 +341,17 @@
     }
 
     textarea { min-height: 92px; resize: vertical; }
+
+    .secure-note {
+      margin: 10px 0 12px;
+      padding: 11px 12px;
+      border: 1px solid #c9e5d4;
+      border-radius: var(--radius);
+      background: #f2f8f5;
+      color: #173b2a;
+      font-size: 13px;
+      font-weight: 800;
+    }
 
     table {
       width: 100%;
@@ -1013,7 +1028,7 @@
         <button data-view="deploy">GitHub 與 Google Sheet</button>
       </nav>
       <div class="side-note">
-        目前版本可直接放到 GitHub Pages。若尚未設定 Google Apps Script，表單會先存到本機瀏覽器，方便課堂測試。
+        資料以 Google Sheet 後台為主；未設定 Apps Script 時，只會暫存在目前這台瀏覽器。
       </div>
     </aside>
 
@@ -1036,11 +1051,11 @@
           <div class="section-head">
             <div>
               <h2>目前排行榜</h2>
-              <p>分數來自核心任務、團隊合作、除錯、創意與同儕回饋。若 Google Sheet 尚未連線，這裡會使用本機示範資料。</p>
+              <p>分數來自核心任務、團隊合作、除錯、創意與同儕回饋。連線後會讀取 Google Sheet；未連線時只顯示本機暫存資料。</p>
             </div>
             <button class="btn primary" id="refreshDataBtn">重新讀取資料</button>
           </div>
-          <div id="connectionStatus" class="notice">尚未設定 Google Apps Script API，現在使用本機資料。</div>
+          <div id="connectionStatus" class="notice">尚未設定 Google Apps Script Web App URL，現在只使用本機暫存資料。</div>
           <div class="grid four" id="scoreMetrics"></div>
           <div class="panel">
             <strong class="label">球隊積分表</strong>
@@ -1107,7 +1122,7 @@
           <div class="section-head">
             <div>
               <h2>球隊、球員登錄與計分</h2>
-              <p>登錄資料會送到 Google Sheet；尚未連線時會先存在本機瀏覽器。建議學生使用暱稱或座號，不輸入公開個資。</p>
+              <p>球隊與球員登錄會送到 Google Sheet；未連線時只會暫存在本機。計分需由老師輸入密碼授權。</p>
             </div>
           </div>
           <div class="grid three">
@@ -1139,6 +1154,7 @@
             </div>
             <div class="panel">
               <strong class="label">新增分數</strong>
+              <div class="secure-note">加分需由老師操作：輸入老師計分密碼後，網站會以 SHA-256 雜湊送到 Apps Script 後台驗證。</div>
               <form id="scoreForm">
                 <div class="form-grid">
                   <label>課程<select name="lessonNo" id="lessonSelect"></select></label>
@@ -1149,6 +1165,7 @@
                   <label>足球創意<input name="creativityPoints" type="number" min="0" max="5" value="5"></label>
                   <label>同儕回饋<input name="peerFeedbackPoints" type="number" min="0" max="3" value="3"></label>
                   <label>任務名稱<input name="mission" placeholder="例如：聲控開球"></label>
+                  <label class="wide">老師計分密碼<input name="teacherPassword" type="password" autocomplete="current-password" required placeholder="老師輸入後才能加分"></label>
                 </div>
                 <label>備註<textarea name="note" placeholder="記錄成功條件、失敗原因或下次改法"></textarea></label>
                 <div class="toolbar"><button class="btn field" type="submit">送出分數</button></div>
@@ -1245,11 +1262,13 @@
               <strong class="label">Google Apps Script API 設定</strong>
               <label>Apps Script Web App URL<input id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></label>
               <label>班級代碼<input id="classCodeInput" value="SOCCER2026"></label>
+              <label>老師密碼（初始化或測試加分用，不會儲存）<input id="setupTeacherPasswordInput" type="password" autocomplete="current-password" placeholder="預設 543861"></label>
               <div class="toolbar">
                 <button class="btn field" id="saveConfigBtn">儲存設定</button>
                 <button class="btn primary" id="testApiBtn">測試連線</button>
+                <button class="btn warn" id="setupBackendBtn">初始化後台</button>
               </div>
-              <div id="apiTestResult" class="notice">尚未測試。</div>
+              <div id="apiTestResult" class="notice">尚未測試。完成部署後，請先按「測試連線」，再按「初始化後台」。</div>
             </div>
             <div class="panel">
               <strong class="label">GitHub Pages 發布步驟</strong>
@@ -1279,12 +1298,48 @@
   </div>
 
   <script id="apps-script-source" type="text/plain">
+const SPREADSHEET_ID = '';
+const DEFAULT_CLASS_CODE = 'SOCCER2026';
+const DEFAULT_TEACHER_PASSWORD_HASH = '6d60392b6d56e300f7c5e8f94415bc675e971037881b673a799a545a91191f04';
+
 const SHEET_NAMES = {
   settings: 'Settings',
   teams: 'Teams',
   players: 'Players',
   scores: 'Scores',
   lessons: 'Lessons'
+};
+
+const SHEET_DEFINITIONS = {
+  Settings: {
+    title: 'mBlock 足球機器人課程後台設定',
+    headers: ['key', 'value', 'note'],
+    defaults: [
+      ['schemaVersion', '2.0', '後台資料表版本'],
+      ['classCode', DEFAULT_CLASS_CODE, '網站送出資料時使用的班級代碼'],
+      ['teacherPasswordHash', DEFAULT_TEACHER_PASSWORD_HASH, '老師計分密碼 SHA-256；預設密碼為 543861'],
+      ['githubPagesUrl', '', '課程網站網址'],
+      ['appsScriptWebAppUrl', '', '部署後貼上 Web App URL'],
+      ['privacyNote', '建議使用學生暱稱、座號或小隊代號，不放公開個資。', ''],
+      ['lastUpdated', today_(), '最後初始化日期']
+    ]
+  },
+  Teams: {
+    title: '球隊登錄 Teams',
+    headers: ['teamId', 'teamName', 'teamColor', 'slogan', 'device', 'createdAt', 'notes']
+  },
+  Players: {
+    title: '球員登錄 Players',
+    headers: ['playerId', 'teamId', 'nickname', 'grade', 'role', 'jerseyNo', 'notes', 'createdAt']
+  },
+  Scores: {
+    title: '計分紀錄 Scores',
+    headers: ['scoreId', 'lessonNo', 'teamId', 'mission', 'corePoints', 'teamworkPoints', 'debugPoints', 'creativityPoints', 'peerFeedbackPoints', 'total', 'note', 'timestamp']
+  },
+  Lessons: {
+    title: '課程資料 Lessons',
+    headers: ['lessonNo', 'title', 'skill', 'footballMission', 'status', 'notes']
+  }
 };
 
 function doGet(e) {
@@ -1307,7 +1362,9 @@ function handleRequest_(params, isGet) {
   const action = params.action || 'all';
   let result;
   try {
-    if (action === 'ping') result = { ok: true, message: 'connected', now: new Date().toISOString() };
+    ensureBackend_();
+    if (action === 'ping') result = { ok: true, message: 'connected', now: new Date().toISOString(), backend: 'google-sheet' };
+    else if (action === 'setup') result = setupBackend_(params);
     else if (action === 'all') result = getAll_();
     else if (action === 'createTeam') result = createTeam_(params);
     else if (action === 'createPlayer') result = createPlayer_(params);
@@ -1328,13 +1385,27 @@ function handleRequest_(params, isGet) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function setupBackend_(params) {
+  validateTeacher_(params);
+  if (params.newClassCode) writeSetting_('classCode', params.newClassCode, '網站送出資料時使用的班級代碼');
+  if (params.githubPagesUrl) writeSetting_('githubPagesUrl', params.githubPagesUrl, '課程網站網址');
+  if (params.appsScriptWebAppUrl) writeSetting_('appsScriptWebAppUrl', params.appsScriptWebAppUrl, '部署後貼上 Web App URL');
+  writeSetting_('lastUpdated', today_(), '最後初始化日期');
+  return Object.assign({ ok: true, message: 'backend initialized' }, getAll_());
+}
+
 function getAll_() {
   return {
     ok: true,
     teams: readObjects_(SHEET_NAMES.teams, 3),
     players: readObjects_(SHEET_NAMES.players, 3),
     scores: readObjects_(SHEET_NAMES.scores, 3),
-    lessons: readObjects_(SHEET_NAMES.lessons, 3)
+    lessons: readObjects_(SHEET_NAMES.lessons, 3),
+    config: {
+      classCode: getSetting_('classCode') || DEFAULT_CLASS_CODE,
+      githubPagesUrl: getSetting_('githubPagesUrl') || '',
+      appsScriptWebAppUrl: getSetting_('appsScriptWebAppUrl') || ''
+    }
   };
 }
 
@@ -1373,6 +1444,7 @@ function createPlayer_(params) {
 
 function addScore_(params) {
   validateClassCode_(params.classCode);
+  validateTeacher_(params);
   const sheet = ss_().getSheetByName(SHEET_NAMES.scores);
   const core = Number(params.corePoints || 0);
   const teamwork = Number(params.teamworkPoints || 0);
@@ -1398,8 +1470,36 @@ function addScore_(params) {
   return Object.assign({ ok: true, scoreId: id }, getAll_());
 }
 
+function ensureBackend_() {
+  Object.keys(SHEET_DEFINITIONS).forEach(sheetName => ensureSheet_(sheetName, SHEET_DEFINITIONS[sheetName]));
+}
+
+function ensureSheet_(sheetName, definition) {
+  const spreadsheet = ss_();
+  let sheet = spreadsheet.getSheetByName(sheetName);
+  if (!sheet) sheet = spreadsheet.insertSheet(sheetName);
+  if (!sheet.getRange(1, 1).getValue()) sheet.getRange(1, 1).setValue(definition.title);
+  const headerRange = sheet.getRange(3, 1, 1, definition.headers.length);
+  const headers = headerRange.getValues()[0];
+  const needsHeaders = definition.headers.some((header, index) => headers[index] !== header);
+  if (needsHeaders) {
+    headerRange.setValues([definition.headers]);
+    headerRange.setFontWeight('bold').setBackground('#eef7f1');
+  }
+  if (sheetName === SHEET_NAMES.settings) seedSettings_(sheet, definition.defaults);
+}
+
+function seedSettings_(sheet, defaults) {
+  const rows = sheet.getRange(4, 1, Math.max(sheet.getLastRow() - 3, 1), 3).getValues();
+  const existingKeys = rows.map(row => String(row[0] || ''));
+  defaults.forEach(row => {
+    if (!existingKeys.includes(row[0])) sheet.appendRow(row);
+  });
+}
+
 function readObjects_(sheetName, headerRow) {
   const sheet = ss_().getSheetByName(sheetName);
+  if (!sheet) return [];
   const lastRow = sheet.getLastRow();
   const lastCol = sheet.getLastColumn();
   if (lastRow <= headerRow) return [];
@@ -1415,16 +1515,48 @@ function readObjects_(sheetName, headerRow) {
 }
 
 function validateClassCode_(provided) {
-  const required = getSetting_('classCode');
+  const required = getSetting_('classCode') || DEFAULT_CLASS_CODE;
   if (required && String(required) !== String(provided || '')) {
     throw new Error('classCode 不正確');
   }
 }
 
+function validateTeacher_(params) {
+  const requiredHash = String(getSetting_('teacherPasswordHash') || DEFAULT_TEACHER_PASSWORD_HASH).trim().toLowerCase();
+  const providedHash = String(params.teacherPasswordHash || params.teacherAuth || '').trim().toLowerCase();
+  const providedPassword = params.teacherPassword ? hash_(params.teacherPassword) : '';
+  if (requiredHash !== providedHash && requiredHash !== providedPassword) {
+    throw new Error('老師計分密碼不正確');
+  }
+}
+
 function getSetting_(key) {
-  const rows = ss_().getSheetByName(SHEET_NAMES.settings).getRange('A3:B20').getValues();
+  const sheet = ss_().getSheetByName(SHEET_NAMES.settings);
+  if (!sheet) return '';
+  const lastRow = Math.max(sheet.getLastRow(), 4);
+  const rows = sheet.getRange(4, 1, lastRow - 3, 3).getValues();
   const found = rows.find(row => row[0] === key);
   return found ? found[1] : '';
+}
+
+function writeSetting_(key, value, note) {
+  const sheet = ss_().getSheetByName(SHEET_NAMES.settings);
+  const lastRow = Math.max(sheet.getLastRow(), 4);
+  const rows = sheet.getRange(4, 1, lastRow - 3, 3).getValues();
+  const index = rows.findIndex(row => row[0] === key);
+  if (index >= 0) {
+    sheet.getRange(index + 4, 2, 1, 2).setValues([[value, note || rows[index][2] || '']]);
+  } else {
+    sheet.appendRow([key, value, note || '']);
+  }
+}
+
+function hash_(value) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(value), Utilities.Charset.UTF_8);
+  return bytes.map(byte => {
+    const normalized = byte < 0 ? byte + 256 : byte;
+    return normalized.toString(16).padStart(2, '0');
+  }).join('');
 }
 
 function today_() {
@@ -1432,7 +1564,10 @@ function today_() {
 }
 
 function ss_() {
-  return SpreadsheetApp.getActiveSpreadsheet();
+  if (SPREADSHEET_ID) return SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  if (!spreadsheet) throw new Error('請從 Google 試算表的 Extensions → Apps Script 建立專案，或在 SPREADSHEET_ID 填入試算表 ID');
+  return spreadsheet;
 }
   </script>
 
@@ -1475,6 +1610,7 @@ function ss_() {
     };
 
     let state = loadLocalData();
+    const DEFAULT_TEACHER_PASSWORD_HASH = "6d60392b6d56e300f7c5e8f94415bc675e971037881b673a799a545a91191f04";
 
     function loadLocalData() {
       const saved = localStorage.getItem("mblockSoccerData");
@@ -1496,6 +1632,22 @@ function ss_() {
       const el = document.getElementById("connectionStatus");
       el.className = "notice " + (kind === "success" ? "success" : kind === "danger" ? "danger" : "");
       el.textContent = message;
+    }
+
+    async function sha256Hex(value) {
+      const data = new TextEncoder().encode(String(value));
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+
+    function isAuthError(message) {
+      return /密碼|classCode|不正確|Unknown action/.test(message || "");
+    }
+
+    async function teacherAuthPayload(password) {
+      const raw = String(password || "").trim();
+      if (!raw) throw new Error("請輸入老師計分密碼");
+      return { teacherPasswordHash: await sha256Hex(raw) };
     }
 
     function jsonp(action, payload = {}) {
@@ -1540,7 +1692,7 @@ function ss_() {
       renderAll();
     }
 
-    async function submitAction(action, payload, localFallback) {
+    async function submitAction(action, payload, localFallback, options = {}) {
       try {
         const data = await jsonp(action, payload);
         if (data.teams) state.teams = data.teams;
@@ -1549,11 +1701,22 @@ function ss_() {
         saveLocalData();
         setStatus("已寫入 Google Sheet。", "success");
       } catch (err) {
+        if (options.requireRemote || isAuthError(err.message)) {
+          setStatus(err.message + "；未寫入資料。", "danger");
+          renderAll();
+          return false;
+        }
+        if (options.verifyLocalTeacherHash && options.verifyLocalTeacherHash !== DEFAULT_TEACHER_PASSWORD_HASH) {
+          setStatus("老師計分密碼不正確；未寫入資料。", "danger");
+          renderAll();
+          return false;
+        }
         localFallback();
         saveLocalData();
         setStatus(err.message + "；已暫存到本機資料。", "danger");
       }
       renderAll();
+      return true;
     }
 
     function teamName(teamId) {
@@ -2159,14 +2322,24 @@ function ss_() {
       event.currentTarget.reset();
     });
 
-    document.getElementById("scoreForm").addEventListener("submit", event => {
+    document.getElementById("scoreForm").addEventListener("submit", async event => {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+      let auth;
+      try {
+        auth = await teacherAuthPayload(data.teacherPassword);
+      } catch (err) {
+        setStatus(err.message + "；未寫入資料。", "danger");
+        return;
+      }
+      delete data.teacherPassword;
       const total = ["corePoints", "teamworkPoints", "debugPoints", "creativityPoints", "peerFeedbackPoints"].reduce((sum, key) => sum + Number(data[key] || 0), 0);
-      submitAction("addScore", data, () => {
+      const ok = await submitAction("addScore", { ...data, ...auth }, () => {
         state.scores.push({ scoreId: "S" + Date.now(), ...data, total, timestamp: new Date().toISOString() });
+      }, {
+        verifyLocalTeacherHash: auth.teacherPasswordHash
       });
-      event.currentTarget.reset();
+      if (ok) event.currentTarget.reset();
     });
 
     document.addEventListener("click", event => {
@@ -2180,6 +2353,7 @@ function ss_() {
       renderConfig();
       document.getElementById("apiTestResult").className = "notice success";
       document.getElementById("apiTestResult").textContent = "設定已儲存。";
+      loadRemoteData();
     });
 
     document.getElementById("testApiBtn").addEventListener("click", async () => {
@@ -2187,7 +2361,35 @@ function ss_() {
       try {
         const data = await jsonp("ping");
         result.className = "notice success";
-        result.textContent = "連線成功：" + (data.message || "connected");
+        result.textContent = "連線成功：" + (data.message || "connected") + "。";
+        await loadRemoteData();
+      } catch (err) {
+        result.className = "notice danger";
+        result.textContent = err.message;
+      }
+    });
+
+    document.getElementById("setupBackendBtn").addEventListener("click", async () => {
+      const result = document.getElementById("apiTestResult");
+      try {
+        localStorage.setItem("mblockSoccerApiUrl", document.getElementById("apiUrlInput").value.trim());
+        localStorage.setItem("mblockSoccerClassCode", document.getElementById("classCodeInput").value.trim() || "SOCCER2026");
+        const auth = await teacherAuthPayload(document.getElementById("setupTeacherPasswordInput").value);
+        const data = await jsonp("setup", {
+          ...auth,
+          newClassCode: document.getElementById("classCodeInput").value.trim() || "SOCCER2026",
+          githubPagesUrl: location.origin + location.pathname,
+          appsScriptWebAppUrl: document.getElementById("apiUrlInput").value.trim()
+        });
+        if (data.teams) state.teams = data.teams;
+        if (data.players) state.players = data.players;
+        if (data.scores) state.scores = data.scores;
+        saveLocalData();
+        result.className = "notice success";
+        result.textContent = "後台初始化完成，已讀取 Google Sheet 資料。";
+        setStatus("已連線 Google Sheet，後台初始化完成。", "success");
+        document.getElementById("setupTeacherPasswordInput").value = "";
+        renderAll();
       } catch (err) {
         result.className = "notice danger";
         result.textContent = err.message;
