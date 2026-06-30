@@ -1991,6 +1991,7 @@ function ss_() {
         1: {
           category: "事件",
           device: "程小奔",
+          sensor: "按鈕與 LED 積木",
           stage: "隊名亮相",
           sensorRows: [["連線", "已連接"], ["模式", "即時"], ["隊色", "紅 / 藍 / 綠 / 黃"]],
           readBlocks: ["當開始", "顯示隊名", "設定 RGB LED", "等待按鈕 A"],
@@ -2000,6 +2001,7 @@ function ss_() {
         2: {
           category: "mBot2 車架",
           device: "程小奔 / mBot2",
+          sensor: "移動、馬達與停止積木",
           stage: "開球跑位",
           sensorRows: [["馬達", "左右輪"], ["速度", "30-50"], ["安全", "先會停止"]],
           readBlocks: ["當按鈕 A 被按下", "前進 1 秒", "停止", "左轉 0.5 秒"],
@@ -2008,7 +2010,8 @@ function ss_() {
         },
         3: {
           category: "偵測",
-          device: "程小奔聲音感測器",
+          device: "程小奔（Codey Rocky）",
+          sensor: "聲音值積木",
           stage: "球迷聲浪",
           sensorRows: [["安靜", "18-25"], ["普通說話", "35-55"], ["全組加油", "70 以上"]],
           readBlocks: ["重複執行", "讀取聲音值", "如果 音量 > 70", "前進並亮隊色"],
@@ -2017,7 +2020,8 @@ function ss_() {
         },
         4: {
           category: "偵測",
-          device: "程小奔光線感測器",
+          device: "程小奔（Codey Rocky）",
+          sensor: "光線值積木",
           stage: "夜間球場",
           sensorRows: [["教室光", "55-75"], ["手遮住", "10-25"], ["手電筒", "85-100"]],
           readBlocks: ["設定 夜賽門檻 = 35", "如果 光線 < 門檻", "RGB LED 全亮", "否則 關燈"],
@@ -2026,7 +2030,8 @@ function ss_() {
         },
         5: {
           category: "灰階感測",
-          device: "程小奔灰階 / mBot2 四路感測器",
+          device: "程小奔 / mBot2",
+          sensor: "灰階或四路顏色感測器積木",
           stage: "沿線跑位",
           sensorRows: [["白底", "高值"], ["黑線", "低值"], ["速度", "先慢後快"]],
           readBlocks: ["如果 左黑右白", "往左修正", "如果 右黑左白", "往右修正", "否則慢速前進"],
@@ -2035,7 +2040,8 @@ function ss_() {
         },
         6: {
           category: "RGB 感測",
-          device: "程小奔 RGB 顏色感測器",
+          device: "程小奔（Codey Rocky）",
+          sensor: "RGB 顏色感測器積木",
           stage: "裁判色卡",
           sensorRows: [["紅卡", "停止"], ["黃卡", "慢速"], ["綠卡", "前進"], ["藍卡", "慶祝"]],
           readBlocks: ["讀取顏色", "如果 顏色 = 紅色", "停止", "LED 顯示同色"],
@@ -2044,7 +2050,8 @@ function ss_() {
         },
         7: {
           category: "超音波 / 紅外線",
-          device: "mBot2 超音波 / 程小奔紅外線",
+          device: "mBot2 / 程小奔",
+          sensor: "超音波或紅外線距離積木",
           stage: "避開防守",
           sensorRows: [["安全距離", "30 cm"], ["警戒距離", "15 cm"], ["碰撞風險", "10 cm 以下"]],
           readBlocks: ["讀取距離", "如果 距離 < 15", "後退", "右轉", "否則前進"],
@@ -2053,7 +2060,8 @@ function ss_() {
         },
         8: {
           category: "事件 / 遙控",
-          device: "程小奔 IR / mBot2 遙控",
+          device: "程小奔 / mBot2",
+          sensor: "IR、按鍵或遙控事件積木",
           stage: "遙控傳球",
           sensorRows: [["上", "前進"], ["下", "後退"], ["左 / 右", "轉向"], ["中鍵", "停止"]],
           readBlocks: ["當收到 上", "前進", "當收到 左", "左轉", "當收到 停止"],
@@ -2062,7 +2070,8 @@ function ss_() {
         },
         9: {
           category: "物聯網",
-          device: "程小奔網路資料",
+          device: "程小奔 + mBlock",
+          sensor: "物聯網天氣資料積木",
           stage: "球場天氣台",
           sensorRows: [["溫度", "台北最高溫"], ["雨天", "延期"], ["空氣品質", "室內訓練"]],
           readBlocks: ["取得天氣資料", "組合字串", "如果 下雨", "播報延期", "廣播訊息"],
@@ -2072,6 +2081,7 @@ function ss_() {
         10: {
           category: "人工智慧",
           device: "Panda 角色 + 程小奔",
+          sensor: "AI 辨識、廣播與分數積木",
           stage: "AI 裁判",
           sensorRows: [["辨識成功", "+1"], ["答案錯誤", "不加分"], ["廣播", "機器人慶祝"]],
           readBlocks: ["設定分數 = 0", "如果 辨識成功", "分數 + 1", "廣播 GOAL"],
@@ -2081,6 +2091,7 @@ function ss_() {
         11: {
           category: "整合專題",
           device: "小組自選設備",
+          sensor: "小組選定的感測器或事件積木",
           stage: "彩排檢查",
           sensorRows: [["作品", "可展示"], ["腳本", "90 秒"], ["除錯", "至少一次"]],
           readBlocks: ["選任務", "整合積木", "測試三次", "記錄修改"],
@@ -2090,6 +2101,7 @@ function ss_() {
         12: {
           category: "成果展演",
           device: "展示設備",
+          sensor: "展示作品使用的核心積木",
           stage: "聯盟展示賽",
           sensorRows: [["展示", "90 秒"], ["回饋", "一優點一建議"], ["計分", "登錄後台"]],
           readBlocks: ["介紹任務", "展示機器人", "說明程式", "回答問題"],
@@ -2105,10 +2117,10 @@ function ss_() {
       return [
         {
           title: "畫面 1：開啟 mBlock 並確認設備",
-          caption: `設備選擇 ${preset.device}，確認連線、模式與本節要使用的積木分類。`,
-          hint: "教師先投影這個畫面，帶學生指出左側分類、中央工作區、右側舞台或設備預覽。",
+          caption: `設備選擇 ${preset.device}；再到「${preset.category}」找 ${preset.sensor}。`,
+          hint: "教師先投影這個畫面，提醒學生：先選程小奔或 mBot2 本體，再找感測器積木，不是另外新增一個感測器設備。",
           category: preset.category,
-          blocks: ["新增設備", `選擇 ${preset.device}`, "連接藍牙 / USB", "切換即時模式"],
+          blocks: ["新增設備", `選擇 ${preset.device}`, `找到 ${preset.sensor}`, "連接藍牙 / USB", "切換即時模式"],
           stage: preset.stage,
           sensorRows: preset.sensorRows,
           notes: ["先確認設備名稱", "按停止鍵測安全", "低年級負責檢查燈號"]
